@@ -42,7 +42,7 @@ const FriendsList = () => {
 
       return data;
     },
-    // refetchInterval: 5000,
+    refetchInterval: 5000,
     initialPageParam: 1,
     getNextPageParam: (lastPage: any, allPages: any) => {
       return lastPage.users.length > 0 ? allPages.length + 1 : undefined;
@@ -64,7 +64,7 @@ const FriendsList = () => {
 
   const filteredUsers = users?.pages.map(
     (page: any) =>
-      page && page.users.filter((fu: UserType) => fu.id !== user.id),
+      page && page.users.filter((fu: UserType) => fu.id !== user?.id),
   );
 
   return (

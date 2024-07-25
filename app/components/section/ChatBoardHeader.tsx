@@ -29,6 +29,7 @@ const ChatBoardHeader: NextPage<Props> = ({ receiverId }) => {
     enabled: receiverId ? true : false,
   });
 
+  
   const { setFriendListActive } = useFriendListActive();
 
   return (

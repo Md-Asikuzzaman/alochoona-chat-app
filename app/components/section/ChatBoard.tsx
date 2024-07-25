@@ -1,6 +1,11 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { NextPage } from "next";
 import { LegacyRef, useEffect, useRef, useState } from "react";
@@ -30,23 +35,34 @@ const ChatBoard: NextPage<Props> = ({
   const path = usePathname();
 
   // [FETCH] data based on receiverID and senderID
+
   const {
     data: messages,
-    isLoading,
-    isFetching,
-  } = useQuery<MessageType[]>({
-    queryKey: ["fetch_messages"],
-    queryFn: async () => {
+    fetchNextPage,
+    hasNextPage,
+    isPending,
+    isFetchingNextPage,
+  } = useInfiniteQuery<MessageType[]>({
+    queryKey: ["projects"],
+    queryFn: async ({ pageParam }) => {
       const { data } = await axios.get(
         `/api/conversations/?senderId=${senderId}&receiverId=${receiverId}`,
         {
-          baseURL: process.env.NEXTAUTH_URL,
+          params: {
+            _initialPage: pageParam,
+            _limitPerPage: 20,
+          },
         },
       );
-      return data.messages;
+
+      return data;
+    },
+    refetchInterval: 1000,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any, allPages: any) => {
+      return lastPage.messages.length > 0 ? allPages.length + 1 : undefined;
     },
     enabled: receiverId && senderId ? true : false,
-    refetchInterval: 1000,
   });
 
   // [UPDATE] online status by InView
@@ -102,18 +118,18 @@ const ChatBoard: NextPage<Props> = ({
   });
 
   // [CHECK] the very last message is come from the server
-  useEffect(() => {
-    if (messages && previousMessages.length > 0) {
-      if (messages.length > previousMessages.length) {
-        scrollToBottom();
-      } else if (messages.length < previousMessages.length) {
-        scrollToBottom();
-      }
-    }
+  // useEffect(() => {
+  //   if (messages && previousMessages.length > 0) {
+  //     if (messages.length > previousMessages.length) {
+  //       scrollToBottom();
+  //     } else if (messages.length < previousMessages.length) {
+  //       scrollToBottom();
+  //     }
+  //   }
 
-    // Update previousMessages with the latest messages
-    setPreviousMessages(messages || []);
-  }, [messages]);
+  //   // Update previousMessages with the latest messages
+  //   setPreviousMessages(messages || []);
+  // }, [messages]);
 
   // [CHECK] is the chat Inview
   const ref = useRef<HTMLDivElement>(null);
@@ -132,13 +148,13 @@ const ChatBoard: NextPage<Props> = ({
     setStatus(0);
   }, [path]);
 
-  useEffect(() => {
-    setStatus((prev) => prev + 1);
-  }, [isFetching]);
+  // useEffect(() => {
+  //   setStatus((prev) => prev + 1);
+  // }, [isFetching]);
 
-  if (status < 2 || isLoading) {
-    return <ChatSkeleton />;
-  }
+  // if (status < 2 || isLoading) {
+  //   return <ChatSkeleton />;
+  // }
 
   return (
     <div
@@ -146,74 +162,76 @@ const ChatBoard: NextPage<Props> = ({
       ref={scrollRef}
     >
       <AnimatePresence mode="popLayout">
-        {messages?.map((data, i) => (
-          <motion.div
-            initial={{
-              scale: 0,
-              opacity: 0,
-              y: 200,
-              visibility: "hidden",
-            }}
-            animate={{
-              scale: 1,
-              opacity: 1,
-              y: 0,
-              visibility: "visible",
-            }}
-            transition={{
-              ease: "backInOut",
-            }}
-            key={i}
-            className={clsx(
-              "flex shrink-0 ",
-              senderId === data.senderId ? "justify-end" : "justify-start",
-            )}
-          >
-            {/* main chat */}
-            <div
-              className="group/item flex max-w-[90%] items-center gap-1"
-              ref={messages && messages.length - 1 ? ref : null}
+        {messages?.pages.map((page: any) =>
+          page.messages.flat().map((data: MessageType) => (
+            <motion.div
+              initial={{
+                scale: 0,
+                opacity: 0,
+                y: 200,
+                visibility: "hidden",
+              }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                visibility: "visible",
+              }}
+              transition={{
+                ease: "backInOut",
+              }}
+              key={data.id}
+              className={clsx(
+                "flex shrink-0 ",
+                senderId === data.senderId ? "justify-end" : "justify-start",
+              )}
             >
+              {/* main chat */}
               <div
-                onClick={() => data.id && mutate(data.id)}
-                className={clsx(
-                  "grid h-6 w-6 shrink-0 translate-x-10 cursor-pointer place-content-center rounded-full bg-zinc-300  transition-transform group-hover/item:translate-x-0",
-                  senderId === data.senderId ? "grid" : "hidden",
-                )}
+                className="group/item flex max-w-[90%] items-center gap-1"
+                // ref={messages && messages.length - 1 ? ref : null}
               >
-                <MdDelete className="text-zinc-500" />
+                <div
+                  onClick={() => data.id && mutate(data.id)}
+                  className={clsx(
+                    "grid h-6 w-6 shrink-0 translate-x-10 cursor-pointer place-content-center rounded-full bg-zinc-300  transition-transform group-hover/item:translate-x-0",
+                    senderId === data.senderId ? "grid" : "hidden",
+                  )}
+                >
+                  <MdDelete className="text-zinc-500" />
+                </div>
+
+                {/* SETUP for [text] type data */}
+                {data.type === "text" && (
+                  <div
+                    className={clsx(
+                      "z-20 inline-block px-4 py-3",
+                      senderId === data.senderId
+                        ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
+                        : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
+                    )}
+                  >
+                    <p>{data.message}</p>
+                  </div>
+                )}
+
+                {/* SETUP for [file] type data */}
+                {data.type === "file" && (
+                  <div
+                    className={clsx(
+                      "z-20 inline-block overflow-hidden",
+                      senderId === data.senderId
+                        ? "rounded-b-xl rounded-s-xl"
+                        : "rounded-b-xl rounded-e-xl",
+                    )}
+                  >
+                    <img src={data.message} height={200} width={200} />
+                  </div>
+                )}
               </div>
-
-              {/* SETUP for [text] type data */}
-              {data.type === "text" && (
-                <div
-                  className={clsx(
-                    "z-20 inline-block px-4 py-3",
-                    senderId === data.senderId
-                      ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
-                      : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
-                  )}
-                >
-                  <p>{data.message}</p>
-                </div>
-              )}
-
-              {/* SETUP for [file] type data */}
-              {data.type === "file" && (
-                <div
-                  className={clsx(
-                    "z-20 inline-block overflow-hidden",
-                    senderId === data.senderId
-                      ? "rounded-b-xl rounded-s-xl"
-                      : "rounded-b-xl rounded-e-xl",
-                  )}
-                >
-                  <img src={data.message} height={200} width={200} />
-                </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          )),
+        )}
       </AnimatePresence>
     </div>
   );

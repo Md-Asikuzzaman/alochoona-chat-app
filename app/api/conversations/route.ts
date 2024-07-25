@@ -15,7 +15,18 @@ export async function GET(
   const receiverId = searchParams.get("receiverId") as string;
 
   try {
+    const url = new URL(req.url);
+    const initialPage: any = url.searchParams.get("_initialPage");
+    const limitPerPage: any = url.searchParams.get("_limitPerPage");
+    const currentPage = Math.max(Number(parseInt(initialPage)) || 1, 1);
+
     const messages = await prisma.message.findMany({
+      take: parseInt(limitPerPage),
+      skip: (currentPage - 1) * parseInt(limitPerPage),
+      orderBy: {
+        updatedAt: "desc",
+      },
+
       where: {
         OR: [
           { senderId: senderId, receiverId: receiverId },
@@ -23,16 +34,8 @@ export async function GET(
         ],
       },
     });
-    if (messages) {
-      return NextResponse.json({ messages }, { status: 200 });
-    } else {
-      return NextResponse.json(
-        {
-          message: "someting went wrong!",
-        },
-        { status: 404 },
-      );
-    }
+
+    return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       {
