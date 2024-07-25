@@ -30,7 +30,7 @@ const Friend: NextPage<Props> = ({
       return data.messages;
     },
 
-    refetchInterval: 1000,
+    // refetchInterval: 1000,
   });
 
   // Filter all messages by sender and receiver id

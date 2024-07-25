@@ -6,9 +6,25 @@ interface ApiResponse {
   users?: UserType[];
 }
 
-export async function GET(): Promise<NextResponse<ApiResponse>> {
+export async function GET(
+  req: Request,
+  res: Response,
+): Promise<NextResponse<ApiResponse>> {
   try {
-    const users = await prisma.user.findMany();
+    const url = new URL(req.url);
+
+    const initialPage: any = url.searchParams.get("_initialPage");
+    const limitPerPage: any = url.searchParams.get("_limitPerPage");
+
+    const currentPage = Math.max(Number(parseInt(initialPage)) || 1, 1);
+
+    const users = await prisma.user.findMany({
+      take: parseInt(limitPerPage),
+      skip: (currentPage - 1) * parseInt(limitPerPage),
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
 
     return NextResponse.json({ users });
   } catch (error) {

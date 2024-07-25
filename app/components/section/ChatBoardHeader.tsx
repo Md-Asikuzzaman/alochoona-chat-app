@@ -61,7 +61,6 @@ const ChatBoardHeader: NextPage<Props> = ({ receiverId }) => {
           </p>
         </div>
       </div>
-
       <LogOutButton />
     </div>
   );
