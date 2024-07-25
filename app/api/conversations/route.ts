@@ -24,9 +24,8 @@ export async function GET(
       take: parseInt(limitPerPage),
       skip: (currentPage - 1) * parseInt(limitPerPage),
       orderBy: {
-        updatedAt: "asc",
+        createdAt: "desc",
       },
-
       where: {
         OR: [
           { senderId: senderId, receiverId: receiverId },

@@ -171,15 +171,7 @@ const ChatBoard: NextPage<Props> = ({
   // }
 
   return (
-    <div
-      className="bg-red flex h-[calc(100vh-160px)] flex-col gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2"
-      ref={scrollRef}
-    >
-      {hasNextPage && !isPending && (
-        <div onClick={() => fetchNextPage()} className="flex justify-center">
-          <LuLoader2 className="animate-spin text-violet-500" size={22} />
-        </div>
-      )}
+    <div className="bg-red flex h-[calc(100vh-160px)] flex-col gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
       <AnimatePresence mode="popLayout">
         {messages?.pages.map((page: any) =>
           page.messages.flat().map((data: MessageType) => (
@@ -252,6 +244,16 @@ const ChatBoard: NextPage<Props> = ({
           )),
         )}
       </AnimatePresence>
+
+      {hasNextPage && !isPending && (
+        <div
+          ref={ref}
+          onClick={() => fetchNextPage()}
+          className="flex justify-center"
+        >
+          <LuLoader2 className="animate-spin text-violet-500" size={22} />
+        </div>
+      )}
     </div>
   );
 };
