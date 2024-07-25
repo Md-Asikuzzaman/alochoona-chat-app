@@ -24,7 +24,7 @@ export async function GET(
       take: parseInt(limitPerPage),
       skip: (currentPage - 1) * parseInt(limitPerPage),
       orderBy: {
-        updatedAt: "desc",
+        updatedAt: "asc",
       },
 
       where: {

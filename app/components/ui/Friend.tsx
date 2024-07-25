@@ -33,19 +33,16 @@ const Friend: NextPage<Props> = ({
     // refetchInterval: 1000,
   });
 
-
-
-  console.log(getMessages);
-
   // Filter all messages by sender and receiver id
   const filteredMessage = getMessages?.filter(
-    (message) => message.senderId === user?.id || message.receiverId === user?.id,
+    (message) =>
+      message.senderId === user?.id || message.receiverId === user?.id,
   );
 
   const { setFriendListActive } = useFriendListActive();
 
   return (
-    <Link onClick={() => setFriendListActive()} href={`/chat/${id}`}> 
+    <Link onClick={() => setFriendListActive()} href={`/chat/${id}`}>
       <div
         className={clsx(
           "flex items-center justify-between gap-4 rounded-xl  p-4 hover:bg-[#E1D1F0]",
