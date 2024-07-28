@@ -7,10 +7,10 @@ import { useParams } from "next/navigation";
 
 import ChatBoardHeader from "@/app/components/ChatBoard/ChatBoardHeader";
 
-import ChatBoradForm from "@/app/components/ChatBoard/ChatBoradForm";
 import LogOutButton from "@/app/components/ui/LogOutButton";
 import { NextPage } from "next";
-import ChatBoardPlayGround from "@/app/components/ChatBoard/ChatBoardPlayGround";
+import ChatBoradForm from "@/app/components/ChatBoard/ChatBoradForm/ChatBoradForm";
+import ChatBoardPlayGround from "@/app/components/ChatBoard/ChatBoardPlayGround/ChatBoardPlayGround";
 
 interface Props {
   currentUser: string | any;

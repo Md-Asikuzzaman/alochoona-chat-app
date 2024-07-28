@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { NextPage } from "next";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { BsFillSendFill } from "react-icons/bs";
-import { IoMdSend } from "react-icons/io";
-import { MdClose, MdEmojiEmotions } from "react-icons/md";
-import { FaRegImage } from "react-icons/fa6";
+
 import { _64ify } from "next-file-64ify";
 import axios from "axios";
 import clsx from "clsx";
 
-import EmojiPlate from "../ui/EmojiPlate";
-import { useParams } from "next/navigation";
+import { MdClose, MdEmojiEmotions } from "react-icons/md";
+import { motion, AnimatePresence } from "framer-motion";
+import { BsFillSendFill } from "react-icons/bs";
+import { FaRegImage } from "react-icons/fa6";
+import { IoMdSend } from "react-icons/io";
+
+import EmojiPlate from "./EmojiPlate";
 
 interface Props {
   currentUser: string;
