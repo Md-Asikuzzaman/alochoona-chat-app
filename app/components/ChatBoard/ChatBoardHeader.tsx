@@ -1,6 +1,5 @@
 "use client";
 
-import { NextPage } from "next";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Avatar from "react-avatar";

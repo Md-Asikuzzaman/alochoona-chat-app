@@ -43,20 +43,19 @@ const ChatClient: NextPage<Props> = ({ currentUser }) => {
     <>
       {/* chat board header */}
       <ChatBoardHeader />
+
       {/* chat board */}
       <ChatBoardPlayGround
         currentUser={currentUser}
         scrollRef={scrollRef}
         scrollToBottom={scrollToBottom}
       />
+
       {/* chat board form */}
       <ChatBoradForm
-        senderId={senderId}
-        receiverId={receiverId}
+        currentUser={currentUser}
         scrollToBottom={scrollToBottom}
       />
-      {/* logout button */}
-      {/* <LogOutButton /> */}
     </>
   );
 };

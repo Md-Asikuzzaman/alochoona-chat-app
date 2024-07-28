@@ -6,7 +6,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Avatar from "react-avatar";
 
-import Friend from "../ui/Friend";
+import Friend from "./Friend";
 import FriendSkeleton from "../ui/FriendSkeleton";
 import clsx from "clsx";
 

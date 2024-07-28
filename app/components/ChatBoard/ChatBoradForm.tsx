@@ -13,21 +13,20 @@ import axios from "axios";
 import clsx from "clsx";
 
 import EmojiPlate from "../ui/EmojiPlate";
+import { useParams } from "next/navigation";
 
 interface Props {
-  senderId: string;
-  receiverId: string;
+  currentUser: string;
   scrollToBottom: () => void;
 }
 
-const ChatBoradForm: NextPage<Props> = ({
-  senderId,
-  receiverId,
-  scrollToBottom,
-}) => {
+const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [message, setMessage] = useState<string>("");
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
   const queryClient = useQueryClient();
+
+  const { id } = useParams();
+  const friendId = id;
 
   useEffect(() => {
     scrollToBottom();
@@ -54,8 +53,8 @@ const ChatBoradForm: NextPage<Props> = ({
     if (message) {
       mutate({
         message,
-        senderId,
-        receiverId,
+        senderId: currentUser,
+        receiverId: friendId,
         type: "text",
       });
     }
@@ -89,8 +88,8 @@ const ChatBoradForm: NextPage<Props> = ({
     myFile &&
       mutate({
         message: myFile,
-        senderId,
-        receiverId,
+        senderId: currentUser,
+        receiverId: friendId,
         type: "file",
       });
 
