@@ -19,6 +19,7 @@ import ChatSkeleton from "../../ui/ChatSkeleton";
 import { LuLoader2 } from "react-icons/lu";
 import { getSession, useSession } from "next-auth/react";
 import Chat from "./Chat";
+import InfiniteLoader from "./InfiniteLoader";
 
 interface Props {
   currentUser: string;
@@ -31,18 +32,16 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   scrollRef,
   scrollToBottom,
 }) => {
-  const queryClient = useQueryClient();
+  const [userSwitch, setUserSwitch] = useState(false);
 
   const { id } = useParams();
   const friendId = id;
-
-  const [userSwitch, setUserSwitch] = useState(false);
 
   useEffect(() => {
     setUserSwitch(true);
   }, [friendId]);
 
-  // [FETCH] data based on receiverID and senderID
+  // [ FETCH ] data based on receiverID and senderID
   const {
     data: messages,
     fetchNextPage,
@@ -65,8 +64,6 @@ const ChatBoardPlayGround: NextPage<Props> = ({
 
       return data;
     },
-
-    // refetchInterval: 1000,
     initialPageParam: 1,
     getNextPageParam: (lastPage: any, allPages: any) => {
       return lastPage.messages.length > 0 ? allPages.length + 1 : undefined;
@@ -74,6 +71,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
     enabled: currentUser && friendId ? true : false,
   });
 
+  // scroll inView
   const { ref, inView, entry } = useInView({
     threshold: 0,
   });
@@ -84,6 +82,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
     }
   }, [inView]);
 
+  // loading indicator
   if (!isFetchingNextPage) {
     if (isPending || isFetching) {
       if (userSwitch) {
