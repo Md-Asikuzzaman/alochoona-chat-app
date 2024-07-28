@@ -7,7 +7,7 @@ import axios from "axios";
 import Avatar from "react-avatar";
 
 import Friend from "./Friend";
-import FriendSkeleton from "../ui/FriendSkeleton";
+import FriendSkeleton from "./FriendSkeleton";
 import clsx from "clsx";
 
 import { IoClose } from "react-icons/io5";

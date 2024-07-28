@@ -15,7 +15,7 @@ import { useInView } from "react-intersection-observer";
 import { MdDelete } from "react-icons/md";
 import clsx from "clsx";
 import { useParams, usePathname } from "next/navigation";
-import ChatSkeleton from "../../ui/ChatSkeleton";
+import ChatSkeleton from "./ChatSkeleton";
 import { LuLoader2 } from "react-icons/lu";
 import { getSession, useSession } from "next-auth/react";
 import Chat from "./Chat";
