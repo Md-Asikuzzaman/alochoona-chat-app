@@ -1,9 +1,11 @@
 import { useFriendListActive } from "@/lib/store";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { CgMenuRight } from "react-icons/cg";
 
 const FriendListMenu = () => {
   const { setFriendListActive } = useFriendListActive();
+  const router = useRouter();
   return (
     <div
       onClick={() => setFriendListActive()}

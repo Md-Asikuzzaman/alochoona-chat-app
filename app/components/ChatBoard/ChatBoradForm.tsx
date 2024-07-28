@@ -45,31 +45,7 @@ const ChatBoradForm: NextPage<Props> = ({
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["fetch_messages"],
-      });
-    },
-
-    onMutate: async (newMessage: object) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["fetch_messages"] });
-      // Snapshot the previous value
-      const previousMessages = queryClient.getQueryData(["fetch_messages"]);
-      // Optimistically update to the new value
-      queryClient.setQueryData(["fetch_messages"], (old: MessageType[]) => [
-        ...old,
-        newMessage,
-      ]);
-      // Return a context object with the snapshotted value
-      return { previousMessages };
-    },
-
-    onError: (err, newMessage, context) => {
-      queryClient.setQueryData(["fetch_messages"], context?.previousMessages);
-    },
-    // Always refetch after error or success:
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetch_messages"] });
+      console.log("Message sent successfully");
     },
   });
 

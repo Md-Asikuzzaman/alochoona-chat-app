@@ -34,10 +34,10 @@ const Friend: NextPage<Props> = ({
   });
 
   // Filter all messages by sender and receiver id
-  const filteredMessage = getMessages?.filter(
-    (message) =>
-      message.senderId === user?.id || message.receiverId === user?.id,
-  );
+  // const filteredMessage = getMessages?.filter(
+  //   (message) =>
+  //     message.senderId === user?.id || message.receiverId === user?.id,
+  // );
 
   const { setFriendListActive } = useFriendListActive();
 
@@ -67,10 +67,10 @@ const Friend: NextPage<Props> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {filteredMessage && filteredMessage[0]?.status === 0 && (
+            {/* {filteredMessage && filteredMessage[0]?.status === 0 && (
               <MdMarkChatUnread className="shrink-0 text-[#8318b4]" size={15} />
-            )}
-            <p
+            )} */}
+            {/* <p
               className={clsx(
                 "text-15px] flex-1 text-[#8318b4]/70",
                 filteredMessage &&
@@ -96,7 +96,7 @@ const Friend: NextPage<Props> = ({
                     No Message
                   </span>
                 ))}
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import FriendList from "../components/section/FriendsList";
+import FriendList from "../components/ChatBoard/FriendsList";
 
 interface Props {
   children: React.ReactNode;

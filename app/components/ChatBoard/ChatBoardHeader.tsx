@@ -1,3 +1,5 @@
+"use client";
+
 import { NextPage } from "next";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -8,12 +10,12 @@ import { CgMenuRight } from "react-icons/cg";
 import moment from "moment";
 import { useFriendListActive } from "@/lib/store";
 import LogOutButton from "../ui/LogOutButton";
+import { useParams } from "next/navigation";
 
-interface Props {
-  receiverId: string;
-}
+const ChatBoardHeader = () => {
+  const { id } = useParams();
+  const friendId = id;
 
-const ChatBoardHeader: NextPage<Props> = ({ receiverId }) => {
   const {
     data: user,
     isLoading,
@@ -21,15 +23,14 @@ const ChatBoardHeader: NextPage<Props> = ({ receiverId }) => {
   } = useQuery<UserType>({
     queryKey: ["fetch_user"],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/users/${receiverId}`, {
+      const { data } = await axios.get(`/api/users/${friendId}`, {
         baseURL: process.env.NEXTAUTH_URL,
       });
       return data.user;
     },
-    enabled: receiverId ? true : false,
+    enabled: friendId ? true : false,
   });
 
-  
   const { setFriendListActive } = useFriendListActive();
 
   return (

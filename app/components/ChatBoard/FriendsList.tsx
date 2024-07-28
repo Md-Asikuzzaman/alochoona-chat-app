@@ -19,6 +19,7 @@ import { useEffect } from "react";
 const FriendsList = () => {
   const params = useParams();
   const { id } = params;
+  
   const receiverId = id as string;
 
   const { data } = useSession();
@@ -36,7 +37,7 @@ const FriendsList = () => {
       const { data } = await axios.get("/api/users", {
         params: {
           _initialPage: pageParam,
-          _limitPerPage: 5,
+          _limitPerPage: 10,
         },
       });
 

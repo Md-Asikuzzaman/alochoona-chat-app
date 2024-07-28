@@ -14,41 +14,46 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { MdDelete } from "react-icons/md";
 import clsx from "clsx";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import ChatSkeleton from "../ui/ChatSkeleton";
 import { LuLoader2 } from "react-icons/lu";
+import { getSession, useSession } from "next-auth/react";
 
 interface Props {
-  senderId: string;
-  receiverId: string;
+  currentUser: string;
   scrollRef: LegacyRef<HTMLDivElement> | null;
   scrollToBottom: () => void;
 }
 
-const ChatBoard: NextPage<Props> = ({
-  receiverId,
-  senderId,
+const ChatBoardPlayGround: NextPage<Props> = ({
+  currentUser,
   scrollRef,
   scrollToBottom,
 }) => {
-  const [previousMessages, setPreviousMessages] = useState<MessageType[]>([]);
   const queryClient = useQueryClient();
 
-  const path = usePathname();
+  const { id } = useParams();
+  const friendId = id;
+
+  const [userSwitch, setUserSwitch] = useState(false);
+
+  useEffect(() => {
+    setUserSwitch(true);
+  }, [friendId]);
 
   // [FETCH] data based on receiverID and senderID
-
   const {
     data: messages,
     fetchNextPage,
     hasNextPage,
     isPending,
     isFetchingNextPage,
+    isFetching,
   } = useInfiniteQuery<MessageType[]>({
     queryKey: ["fetch_messages"],
     queryFn: async ({ pageParam }) => {
       const { data } = await axios.get(
-        `/api/conversations/?senderId=${senderId}&receiverId=${receiverId}`,
+        `/api/conversations/?senderId=${currentUser}&receiverId=${friendId}`,
         {
           params: {
             _initialPage: pageParam,
@@ -59,15 +64,14 @@ const ChatBoard: NextPage<Props> = ({
 
       return data;
     },
+
     // refetchInterval: 1000,
     initialPageParam: 1,
     getNextPageParam: (lastPage: any, allPages: any) => {
       return lastPage.messages.length > 0 ? allPages.length + 1 : undefined;
     },
-    enabled: receiverId && senderId ? true : false,
+    enabled: currentUser && friendId ? true : false,
   });
-
-  console.log(messages);
 
   const { ref, inView, entry } = useInView({
     threshold: 0,
@@ -79,96 +83,13 @@ const ChatBoard: NextPage<Props> = ({
     }
   }, [inView]);
 
-  // [UPDATE] online status by InView
-  const { mutate: updateStatusMutate } = useMutation({
-    mutationKey: ["update_message"],
-    mutationFn: async (id: string) => {
-      const { data } = await axios.patch(`/api/messages/${id}`, {
-        baseURL: process.env.NEXTAUTH_URL,
-      });
-      return data;
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["fetch_messages", "fetch_users"],
-      });
-    },
-  });
-
-  // [DELETE] message by ID
-  const { mutate } = useMutation({
-    mutationKey: ["delete_message"],
-    mutationFn: async (id: string) => {
-      const { data } = await axios.delete(`/api/messages/${id}`, {
-        baseURL: process.env.NEXTAUTH_URL,
-      });
-      return data;
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["fetch_messages"],
-      });
-    },
-
-    onMutate: async (id: string) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["fetch_messages"] });
-      // Snapshot the previous value
-      const previousMessages = queryClient.getQueryData(["fetch_messages"]);
-      // Optimistically update to the new value
-      queryClient.setQueryData(["fetch_messages"], (old: MessageType[]) => {
-        // Filter out posts with IDs present in the 'id' array
-        return old.filter((message) => message.id !== id);
-      });
-      return { previousMessages };
-    },
-
-    // Always refetch after error or success:
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetch_messages"] });
-    },
-  });
-
-  // [CHECK] the very last message is come from the server
-  // useEffect(() => {
-  //   if (messages && previousMessages.length > 0) {
-  //     if (messages.length > previousMessages.length) {
-  //       scrollToBottom();
-  //     } else if (messages.length < previousMessages.length) {
-  //       scrollToBottom();
-  //     }
-  //   }
-
-  //   // Update previousMessages with the latest messages
-  //   setPreviousMessages(messages || []);
-  // }, [messages]);
-
-  // [CHECK] is the chat Inview
-  // const ref = useRef<HTMLDivElement>(null);
-  // const inView = useInView(ref);
-
-  useEffect(() => {
-    if (inView) {
-      updateStatusMutate(receiverId);
+  if (!isFetchingNextPage) {
+    if (isPending || isFetching) {
+      if (userSwitch) {
+        return <ChatSkeleton />;
+      }
     }
-  }, [inView]);
-
-  const [status, setStatus] = useState<number>(0);
-
-  // [LOADING] when the new conversation will start
-  useEffect(() => {
-    setStatus(0);
-  }, [path]);
-
-  // useEffect(() => {
-  //   setStatus((prev) => prev + 1);
-  // }, [isFetching]);
-
-  // if (status < 2 || isLoading) {
-  //   return <ChatSkeleton />;
-  // }
+  }
 
   return (
     <div className="bg-red flex h-[calc(100vh-160px)] flex-col gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
@@ -194,19 +115,16 @@ const ChatBoard: NextPage<Props> = ({
               key={data.id}
               className={clsx(
                 "flex shrink-0 ",
-                senderId === data.senderId ? "justify-end" : "justify-start",
+                currentUser === data.senderId ? "justify-end" : "justify-start",
               )}
             >
               {/* main chat */}
-              <div
-                className="group/item flex max-w-[90%] items-center gap-1"
-                // ref={messages && messages.length - 1 ? ref : null}
-              >
+              <div className="group/item flex max-w-[90%] items-center gap-1">
                 <div
-                  onClick={() => data.id && mutate(data.id)}
+                  onClick={() => {}}
                   className={clsx(
                     "grid h-6 w-6 shrink-0 translate-x-10 cursor-pointer place-content-center rounded-full bg-zinc-300  transition-transform group-hover/item:translate-x-0",
-                    senderId === data.senderId ? "grid" : "hidden",
+                    currentUser === data.senderId ? "grid" : "hidden",
                   )}
                 >
                   <MdDelete className="text-zinc-500" />
@@ -217,7 +135,7 @@ const ChatBoard: NextPage<Props> = ({
                   <div
                     className={clsx(
                       "z-20 inline-block px-4 py-3",
-                      senderId === data.senderId
+                      currentUser === data.senderId
                         ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
                         : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
                     )}
@@ -231,7 +149,7 @@ const ChatBoard: NextPage<Props> = ({
                   <div
                     className={clsx(
                       "z-20 inline-block overflow-hidden",
-                      senderId === data.senderId
+                      currentUser === data.senderId
                         ? "rounded-b-xl rounded-s-xl"
                         : "rounded-b-xl rounded-e-xl",
                     )}
@@ -245,7 +163,7 @@ const ChatBoard: NextPage<Props> = ({
         )}
       </AnimatePresence>
 
-      {hasNextPage && !isPending && (
+      {hasNextPage && (
         <div
           ref={ref}
           onClick={() => fetchNextPage()}
@@ -258,4 +176,4 @@ const ChatBoard: NextPage<Props> = ({
   );
 };
 
-export default ChatBoard;
+export default ChatBoardPlayGround;
