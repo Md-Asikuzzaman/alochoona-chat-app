@@ -17,32 +17,8 @@ const Friend: NextPage<Props> = ({
   user: { id, username, status },
   receiverId,
 }) => {
-  const { data } = useSession();
-  const user = data?.user as SessionType;
-
-  const { data: getMessages } = useQuery<MessageType[]>({
-    queryKey: ["getMessage", id],
-    queryFn: async () => {
-      const { data } = await axios.get(`/api/messages/${id}`, {
-        baseURL: process.env.NEXTAUTH_URL,
-      });
-
-      return data.messages;
-    },
-
-    // refetchInterval: 1000,
-  });
-
-  // Filter all messages by sender and receiver id
-  // const filteredMessage = getMessages?.filter(
-  //   (message) =>
-  //     message.senderId === user?.id || message.receiverId === user?.id,
-  // );
-
-  const { setFriendListActive } = useFriendListActive();
-
   return (
-    <Link onClick={() => setFriendListActive()} href={`/chat/${id}`}>
+    <Link onClick={() => {}} href={`/chat/${id}`}>
       <div
         className={clsx(
           "flex items-center justify-between gap-4 rounded-xl  p-4 hover:bg-[#E1D1F0]",
@@ -67,36 +43,7 @@ const Friend: NextPage<Props> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {/* {filteredMessage && filteredMessage[0]?.status === 0 && (
-              <MdMarkChatUnread className="shrink-0 text-[#8318b4]" size={15} />
-            )} */}
-            {/* <p
-              className={clsx(
-                "text-15px] flex-1 text-[#8318b4]/70",
-                filteredMessage &&
-                  filteredMessage[0]?.status === 0 &&
-                  "font-semibold text-[#8318b4]",
-              )}
-            >
-              {filteredMessage && filteredMessage[0]?.type === "text" && (
-                <span className={`text-sm text-[#8318b4]/70`}>
-                  {filteredMessage[0]?.message.length > 30
-                    ? filteredMessage[0]?.message.slice(0, 30) + " ..."
-                    : filteredMessage[0]?.message}
-                </span>
-              )}
-
-              {filteredMessage && filteredMessage[0]?.type === "file" && (
-                <span className={`text-sm text-[#8318b4]/70`}>Send a file</span>
-              )}
-
-              {!filteredMessage ||
-                (filteredMessage?.length == 0 && (
-                  <span className={`text-sm text-[#8318b4]/70`}>
-                    No Message
-                  </span>
-                ))}
-            </p> */}
+            <p className="text-sm">New messages!</p>
           </div>
         </div>
       </div>

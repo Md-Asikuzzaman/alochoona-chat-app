@@ -45,6 +45,24 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       return message;
     },
 
+    onMutate: async (newMessage: object) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["fetch_messages"] });
+      // Snapshot the previous value
+      const previousMessages = queryClient.getQueryData(["fetch_messages"]);
+      // Optimistically update to the new value
+      queryClient.setQueryData(["fetch_messages"], (old: any) =>
+        // console.log(old.pages),
+
+        old.pages.map((page: any) => console.log([...page, newMessage])),
+      );
+      // Return a context object with the snapshotted value
+
+      console.log(previousMessages);
+
+      return { previousMessages };
+    },
+
     onSuccess: () => {
       console.log("Message sent successfully");
     },

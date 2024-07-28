@@ -1,25 +1,17 @@
 "use client";
 
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import axios from "axios";
 import { NextPage } from "next";
-import { LegacyRef, useEffect, useRef, useState } from "react";
+import { LegacyRef, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { MdDelete } from "react-icons/md";
-import clsx from "clsx";
-import { useParams, usePathname } from "next/navigation";
-import ChatSkeleton from "./ChatSkeleton";
+import axios from "axios";
 import { LuLoader2 } from "react-icons/lu";
-import { getSession, useSession } from "next-auth/react";
+
 import Chat from "./Chat";
-import InfiniteLoader from "./InfiniteLoader";
+import ChatSkeleton from "./ChatSkeleton";
 
 interface Props {
   currentUser: string;
@@ -80,7 +72,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
     if (inView) {
       fetchNextPage();
     }
-  }, [inView]);
+  }, [!isPending && !isFetching && inView]);
 
   // loading indicator
   if (!isFetchingNextPage) {
@@ -92,7 +84,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   }
 
   return (
-    <div className="bg-red flex h-[calc(100vh-160px)] flex-col gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
+    <div className="bg-red flex h-[calc(100vh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
       <AnimatePresence mode="popLayout">
         {messages?.pages.map((page: any) =>
           page.messages
