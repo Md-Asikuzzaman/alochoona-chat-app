@@ -15,6 +15,7 @@ import EmojiPlate from "./EmojiPlate";
 import { _64ify } from "next-file-64ify";
 
 import { io } from "socket.io-client";
+import { useSession } from "next-auth/react";
 
 interface Props {
   currentUser: string;
@@ -22,7 +23,7 @@ interface Props {
 }
 
 // socket hooks
-const useSocket = () => {
+const useSocket = (userId: any, friendId: any) => {
   const socketRef = useRef<any | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
@@ -31,13 +32,22 @@ const useSocket = () => {
     const newSocket = io("http://localhost:8080");
     socketRef.current = newSocket;
 
+    if (userId) {
+      newSocket.emit("registerUser", userId);
+    }
+
     // socket event handlers
     newSocket.on("connect", () => {
       setIsConnected(true);
     });
 
-    newSocket.on("newServerMessage", (data) => {
-      setNewMessageFromServer(data);
+    newSocket.on("newServerMessage", ({ message, receiverId, senderId }) => {
+      if (
+        (receiverId === userId && senderId === friendId) ||
+        (receiverId === friendId && senderId === userId)
+      ) {
+        setNewMessageFromServer(message);
+      }
     });
 
     return () => {
@@ -51,7 +61,12 @@ const useSocket = () => {
 };
 
 const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
-  const { socket, isConnected, newMessageFromServer } = useSocket();
+  const { id } = useParams();
+  const friendId = id;
+  const { socket, isConnected, newMessageFromServer } = useSocket(
+    currentUser,
+    friendId,
+  );
 
   const [message, setMessage] = useState<string>("");
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
@@ -59,10 +74,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [fileModal, setFileModal] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
-  const { id } = useParams();
-  const friendId = id;
-
-  const [chats, setChats] = useState<any>([]);
 
   useEffect(() => {
     scrollToBottom();
