@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { LegacyRef, useEffect, useState } from "react";
+import { ForwardedRef, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import ChatSkeleton from "./ChatSkeleton";
 
 interface Props {
   currentUser: string;
-  scrollRef: LegacyRef<HTMLDivElement> | null;
+  scrollRef: any;
   scrollToBottom: () => void;
 }
 
@@ -63,6 +63,8 @@ const ChatBoardPlayGround: NextPage<Props> = ({
     enabled: currentUser && friendId ? true : false,
   });
 
+  console.log(messages);
+
   // scroll inView
   const { ref, inView, entry } = useInView({
     threshold: 0,
@@ -90,7 +92,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
           page.messages
             .flat()
             .map((data: MessageType) => (
-              <Chat data={data} currentUser={currentUser} />
+              <Chat key={data.id} data={data} currentUser={currentUser} />
             )),
         )}
       </AnimatePresence>
