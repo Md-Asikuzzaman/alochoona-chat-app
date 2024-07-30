@@ -97,7 +97,12 @@ const FriendsList = () => {
             : filteredUsers
                 ?.flat()
                 ?.map((user: UserType) => (
-                  <Friend key={user.id} user={user} receiverId={receiverId} />
+                  <Friend
+                    key={user.id}
+                    setFriendListActive={setFriendListActive}
+                    user={user}
+                    receiverId={receiverId}
+                  />
                 ))}
 
           {hasNextPage && !isPending && (

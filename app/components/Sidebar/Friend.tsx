@@ -11,14 +11,16 @@ import { MdMarkChatUnread } from "react-icons/md";
 interface Props {
   user: UserType;
   receiverId: string;
+  setFriendListActive: () => void;
 }
 
 const Friend: NextPage<Props> = ({
   user: { id, username, status },
   receiverId,
+  setFriendListActive,
 }) => {
   return (
-    <Link onClick={() => {}} href={`/chat/${id}`}>
+    <Link onClick={() => setFriendListActive()} href={`/chat/${id}`}>
       <div
         className={clsx(
           "flex items-center justify-between gap-4 rounded-xl  p-4 hover:bg-[#E1D1F0]",
