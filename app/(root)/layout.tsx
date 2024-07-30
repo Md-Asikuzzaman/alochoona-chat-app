@@ -1,11 +1,11 @@
 import { NextPage } from "next";
 import FriendList from "../components/Sidebar/FriendsList";
-
 interface Props {
   children: React.ReactNode;
 }
 
-const Layout: NextPage<Props> = ({ children }) => {
+const Layout: NextPage<Props> = async ({ children }) => {
+
   return (
     <section className="h-[100dvh] w-full overflow-hidden">
       <div className="mx-auto lg:container">

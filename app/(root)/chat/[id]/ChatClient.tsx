@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatBoardHeader from "@/app/components/ChatBoard/ChatBoardHeader";
 import { NextPage } from "next";
 import ChatBoradForm from "@/app/components/ChatBoard/ChatBoradForm/ChatBoradForm";
 import ChatBoardPlayGround from "@/app/components/ChatBoard/ChatBoardPlayGround/ChatBoardPlayGround";
+import { io } from "socket.io-client";
 
 interface Props {
   currentUser: string | any;
@@ -24,6 +25,7 @@ const ChatClient: NextPage<Props> = ({ currentUser }) => {
     }
   };
 
+  // socket connection
   return (
     <>
       {/* chat board header */}

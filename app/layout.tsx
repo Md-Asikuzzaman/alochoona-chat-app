@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "./components/providers/ReactQueryProvider";
 import NextAuthProvider from "./components/providers/NextAuthProvider";
+import { SocketProvider } from "./components/providers/SocketProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,9 @@ export default function RootLayout({
         className={`${inter.className} bg-slate-900`}
       >
         <NextAuthProvider>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <SocketProvider>
+            <ReactQueryProvider>{children}</ReactQueryProvider>
+          </SocketProvider>
         </NextAuthProvider>
       </body>
     </html>

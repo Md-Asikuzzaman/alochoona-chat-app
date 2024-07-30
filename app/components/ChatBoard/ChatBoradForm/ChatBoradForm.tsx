@@ -14,69 +14,26 @@ import { IoMdSend } from "react-icons/io";
 import EmojiPlate from "./EmojiPlate";
 import { _64ify } from "next-file-64ify";
 
-import { io } from "socket.io-client";
+import { useSocket } from "../../providers/SocketProvider";
 
 interface Props {
   currentUser: string;
   scrollToBottom: () => void;
 }
 
-// socket hooks
-export const useSocket = (userId: any, friendId: any) => {
-  const socketRef = useRef<any | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+//  if (
+//    (receiverId === userId && senderId === friendId) ||
+//    (receiverId === friendId && senderId === userId)
+//  ) {
+//    setNewMessageFromSocket(message);
+//  }
 
-  const [newMessageFromSocket, setNewMessageFromSocket] = useState<object>();
-  const [targetSocketId, setTargetSocketId] = useState<object>();
-
-  useEffect(() => {
-    const newSocket = io(
-      "https://realtime-chat-app-socket-production.up.railway.app",
-    );
-    socketRef.current = newSocket;
-
-    if (userId) {
-      newSocket.emit("registerUser", { userId, friendId });
-    }
-
-    // socket event handlers
-    newSocket.on("connect", () => {
-      setIsConnected(true);
-    });
-
-    newSocket.on("newServerMessage", ({ message, receiverId, senderId }) => {
-      if (
-        (receiverId === userId && senderId === friendId) ||
-        (receiverId === friendId && senderId === userId)
-      ) {
-        setNewMessageFromSocket(message);
-      }
-    });
-
-    // Find Targeted Socket
-    newSocket.emit("findFriendSocket", { userId, friendId });
-    newSocket.on("friendOnline", (data) => {
-      setTargetSocketId(data);
-    });
-
-    return () => {
-      if (newSocket) {
-        newSocket.disconnect();
-      }
-    };
-  }, []);
-
-  return {
-    socket: socketRef.current,
-    isConnected,
-    newMessageFromSocket,
-    targetSocketId,
-  };
-};
+// separated logic
 
 const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [message, setMessage] = useState<string>("");
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
+
   const [myFile, setMyFile] = useState<string>("");
   const [fileModal, setFileModal] = useState<boolean>(false);
 
@@ -85,10 +42,25 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const { id } = useParams();
   const friendId = id;
 
-  const { socket, isConnected, newMessageFromSocket, targetSocketId } =
-    useSocket(currentUser, friendId);
+  // socket useEffects
+  const { socket } = useSocket();
 
-  // Send a new message to the server
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.emit("newMessage", {
+  //       message,
+  //       senderId: currentUser,
+  //       receiverId: friendId,
+  //       type: "text",
+  //     });
+
+  //     socket.on("updateUsers", (data) => {
+  //       console.log(data);
+  //     });
+  //   }
+  // }, [socket]);
+
+  // [ server ] Send a new message to the server
   const { mutate } = useMutation({
     mutationKey: ["send_message"],
     mutationFn: async (newMessage: object) => {
@@ -105,44 +77,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     },
   });
 
-  // Optimistically update messages by the socket server
-  useEffect(() => {
-    if (isConnected && socket) {
-      const newMessageWithId = {
-        ...newMessageFromSocket,
-        id: Math.random().toString(36).substring(2, 15),
-      };
-
-      queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
-        if (oldData?.pages) {
-          // Prepend the new message to the beginning of the pages array
-          return {
-            ...oldData,
-            pages: [
-              {
-                messages: [newMessageWithId],
-              },
-              ...oldData.pages,
-            ],
-          };
-        }
-        // Handle the case where there are no messages yet
-        return {
-          pages: [
-            {
-              messages: [newMessageWithId],
-            },
-          ],
-        };
-      });
-    }
-    scrollToBottom();
-
-    setTimeout(() => {
-      scrollToBottom();
-    }, 1000);
-  }, [newMessageFromSocket]);
-
   // Optimistically update messages by the user message
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,85 +88,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       type: "text",
     };
 
-    if (message) {
-      mutate(newMessagess);
-
-      if (!targetSocketId) {
-        const newMessageWithId = {
-          ...newMessagess,
-          id: Math.random().toString(36).substring(2, 15),
-        };
-
-        queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
-          if (oldData?.pages) {
-            return {
-              ...oldData,
-              pages: [
-                {
-                  messages: [newMessageWithId],
-                },
-                ...oldData.pages,
-              ],
-            };
-          }
-
-          return {
-            pages: [
-              {
-                messages: [newMessageWithId],
-              },
-            ],
-          };
-        });
-      }
-
-      // Calling the socket server after the button has been clicked
-      if (isConnected && socket) {
-        socket.emit("newMessage", {
-          message,
-          senderId: currentUser,
-          receiverId: friendId,
-          type: "text",
-        });
-      }
-    }
-    setMessage("");
-    setEmojiPlate(false);
-    scrollToBottom();
-
-    setTimeout(() => {
-      scrollToBottom();
-    }, 1000);
-  };
-
-  // this method is disabled
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      const { data, isLoading, isError, isValidSize } = await _64ify(
-        file,
-        ["image/jpeg", "image/png"],
-        { minSize: 0, maxSize: 1024 },
-      );
-      if (data) {
-        setMyFile(data);
-        setFileModal(true);
-      }
-    }
-  };
-
-  // this method is disabled
-  const handleFileUpload = () => {
-    if (myFile) {
-      mutate({
-        message: myFile,
-        senderId: currentUser,
-        receiverId: friendId,
-        type: "file",
-      });
-      setFileModal(false);
-      setMyFile("");
-    }
+    mutate(newMessagess);
   };
 
   return (
