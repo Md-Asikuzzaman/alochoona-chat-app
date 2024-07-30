@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,23 +21,17 @@ interface Props {
   scrollToBottom: () => void;
 }
 
-//  if (
-//    (receiverId === userId && senderId === friendId) ||
-//    (receiverId === friendId && senderId === userId)
-//  ) {
-//    setNewMessageFromSocket(message);
-//  }
-
-// separated logic
-
 const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [message, setMessage] = useState<string>("");
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
 
   const [myFile, setMyFile] = useState<string>("");
   const [fileModal, setFileModal] = useState<boolean>(false);
+  const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
 
   const queryClient = useQueryClient();
+
+  console.log({ newMessageFromServer });
 
   const { id } = useParams();
   const friendId = id;
@@ -45,17 +39,38 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   // socket useEffects
   const { socket } = useSocket();
 
+  const userId = currentUser;
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newMessageFromServer", (data) => {
+        if (
+          (data.receiverId === userId && data.senderId === friendId) ||
+          (data.receiverId === friendId && data.senderId === userId)
+        ) {
+          setNewMessageFromServer(data);
+        }
+      });
+    }
+    if (socket) {
+      socket.emit("registerUser", userId);
+
+      socket.on("updateUsers", (data) => {
+        console.log(data);
+      });
+    }
+  }, [socket, setNewMessageFromServer]);
+
   // useEffect(() => {
   //   if (socket) {
-  //     socket.emit("newMessage", {
-  //       message,
-  //       senderId: currentUser,
-  //       receiverId: friendId,
-  //       type: "text",
+  //     socket.emit("findFriendSocket", friendId);
+
+  //     socket.on("friendOnline", (data) => {
+  //       setFriendOnline(true);
   //     });
 
-  //     socket.on("updateUsers", (data) => {
-  //       console.log(data);
+  //     socket.on("friendOffline", (data) => {
+  //       setFriendOnline(false);
   //     });
   //   }
   // }, [socket]);
@@ -77,18 +92,89 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     },
   });
 
+  useEffect(() => {
+    if (newMessageFromServer) {
+      const newMessageWithId = {
+        ...newMessageFromServer,
+        id: Math.random().toString(36).substring(2, 15),
+      };
+
+      queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
+        if (oldData?.pages) {
+          return {
+            ...oldData,
+            pages: [
+              {
+                messages: [newMessageWithId],
+              },
+              ...oldData.pages,
+            ],
+          };
+        }
+        return {
+          pages: [
+            {
+              messages: [newMessageWithId],
+            },
+          ],
+        };
+      });
+    }
+  }, [newMessageFromServer]);
+
   // Optimistically update messages by the user message
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (message) {
+      const newMessagess = {
+        message,
+        senderId: currentUser,
+        receiverId: friendId,
+        type: "text",
+      };
 
-    const newMessagess = {
-      message,
-      senderId: currentUser,
-      receiverId: friendId,
-      type: "text",
-    };
+      mutate(newMessagess);
 
-    mutate(newMessagess);
+      if (true) {
+        const newMessageWithId = {
+          ...newMessagess,
+          id: Math.random().toString(36).substring(2, 15),
+        };
+
+        queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
+          if (oldData?.pages) {
+            return {
+              ...oldData,
+              pages: [
+                {
+                  messages: [newMessageWithId],
+                },
+                ...oldData.pages,
+              ],
+            };
+          }
+
+          return {
+            pages: [
+              {
+                messages: [newMessageWithId],
+              },
+            ],
+          };
+        });
+      }
+
+      if (socket) {
+        socket.emit("newMessage", {
+          message,
+          senderId: currentUser,
+          receiverId: friendId,
+          type: "text",
+        });
+      }
+    }
+    setMessage("");
+    setEmojiPlate(false);
   };
 
   return (
