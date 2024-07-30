@@ -136,13 +136,16 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         };
       });
     }
+    scrollToBottom();
+
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
   }, [newMessageFromSocket]);
 
   // Optimistically update messages by the user message
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    scrollToBottom();
 
     const newMessagess = {
       message,
@@ -195,6 +198,11 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
     setMessage("");
     setEmojiPlate(false);
+    scrollToBottom();
+
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
   };
 
   // this method is disabled

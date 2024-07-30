@@ -16,14 +16,9 @@ import ChatSkeleton from "./ChatSkeleton";
 interface Props {
   currentUser: string;
   scrollRef: any;
-  scrollToBottom: () => void;
 }
 
-const ChatBoardPlayGround: NextPage<Props> = ({
-  currentUser,
-  scrollRef,
-  scrollToBottom,
-}) => {
+const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
   const [userSwitch, setUserSwitch] = useState(false);
 
   const { id } = useParams();
@@ -86,7 +81,10 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   }
 
   return (
-    <div className="flex h-[calc(100dvh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
+    <div
+      ref={scrollRef}
+      className="flex h-[calc(100dvh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2"
+    >
       <AnimatePresence mode="popLayout">
         {messages?.pages.map((page: any) =>
           page.messages
