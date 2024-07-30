@@ -30,7 +30,9 @@ export const useSocket = (userId: any, friendId: any) => {
   const [targetSocketId, setTargetSocketId] = useState<object>();
 
   useEffect(() => {
-    const newSocket = io("http://localhost:8080");
+    const newSocket = io(
+      "https://realtime-chat-app-socket-production.up.railway.app",
+    );
     socketRef.current = newSocket;
 
     if (userId) {
@@ -135,10 +137,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       });
     }
   }, [newMessageFromSocket]);
-
-  useEffect(() => {
-    console.log(targetSocketId);
-  }, [targetSocketId]);
 
   // Optimistically update messages by the user message
   const handleSubmit = (e: React.FormEvent) => {
