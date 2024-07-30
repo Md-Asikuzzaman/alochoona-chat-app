@@ -86,7 +86,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   }
 
   return (
-    <div className="bg-red flex h-[calc(100vh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
+    <div className="flex h-[calc(100vh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2">
       <AnimatePresence mode="popLayout">
         {messages?.pages.map((page: any) =>
           page.messages

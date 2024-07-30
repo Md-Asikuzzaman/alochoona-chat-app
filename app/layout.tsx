@@ -18,7 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body suppressHydrationWarning={true} className={`${inter.className}`}>
+      <body
+        suppressHydrationWarning={true}
+        className={`${inter.className} bg-slate-900`}
+      >
         <NextAuthProvider>
           <ReactQueryProvider>{children}</ReactQueryProvider>
         </NextAuthProvider>
