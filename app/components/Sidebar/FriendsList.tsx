@@ -19,7 +19,7 @@ import { useEffect } from "react";
 const FriendsList = () => {
   const params = useParams();
   const { id } = params;
-  
+
   const receiverId = id as string;
 
   const { data } = useSession();
@@ -71,7 +71,7 @@ const FriendsList = () => {
   return (
     <div
       className={clsx(
-        "hiddedn 0 absolute left-0 top-0 z-[9999999] w-[280px] bg-white shadow-lg transition-transform sm:w-[400px] lg:relative lg:shadow-none",
+        "hiddedn 0 absolute left-0 top-0 z-[9999999] w-[88%] bg-white shadow-lg transition-transform sm:w-[85%] md:w-[70%] lg:relative lg:w-[390px] lg:shadow-none",
         friendListActive
           ? "-translate-x-[110%] lg:translate-x-0"
           : "translate-x-0",
@@ -85,7 +85,7 @@ const FriendsList = () => {
         {/* close button*/}
         <div
           onClick={() => setFriendListActive()}
-          className="absolute right-0 flex h-10 w-10 translate-x-1/2 translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:bg-rose-200 lg:hidden"
+          className="absolute right-0 flex h-10 w-10 -translate-y-[50px] translate-x-1/2 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:bg-rose-200 lg:hidden"
         >
           <IoClose size={20} />
         </div>
