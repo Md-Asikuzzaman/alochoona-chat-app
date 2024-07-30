@@ -228,7 +228,10 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="absolute bottom-2 left-0 right-0">
+    <form
+      onSubmit={handleSubmit}
+      className="absolute bottom-2 left-0 right-0 z-50"
+    >
       <div className="relative flex flex-1 items-center gap-2 p-3">
         <div className="relative flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2">
           <label>
