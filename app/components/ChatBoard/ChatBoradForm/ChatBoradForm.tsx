@@ -15,7 +15,6 @@ import EmojiPlate from "./EmojiPlate";
 import { _64ify } from "next-file-64ify";
 
 import { io } from "socket.io-client";
-import { useSession } from "next-auth/react";
 
 interface Props {
   currentUser: string;
@@ -23,17 +22,19 @@ interface Props {
 }
 
 // socket hooks
-const useSocket = (userId: any, friendId: any) => {
+export const useSocket = (userId: any, friendId: any) => {
   const socketRef = useRef<any | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
+
+  const [newMessageFromSocket, setNewMessageFromSocket] = useState<object>();
+  const [targetSocketId, setTargetSocketId] = useState<object>();
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
     socketRef.current = newSocket;
 
     if (userId) {
-      newSocket.emit("registerUser", userId);
+      newSocket.emit("registerUser", { userId, friendId });
     }
 
     // socket event handlers
@@ -46,8 +47,14 @@ const useSocket = (userId: any, friendId: any) => {
         (receiverId === userId && senderId === friendId) ||
         (receiverId === friendId && senderId === userId)
       ) {
-        setNewMessageFromServer(message);
+        setNewMessageFromSocket(message);
       }
+    });
+
+    // Find Targeted Socket
+    newSocket.emit("findFriendSocket", { userId, friendId });
+    newSocket.on("friendOnline", (data) => {
+      setTargetSocketId(data);
     });
 
     return () => {
@@ -57,17 +64,15 @@ const useSocket = (userId: any, friendId: any) => {
     };
   }, []);
 
-  return { socket: socketRef.current, isConnected, newMessageFromServer };
+  return {
+    socket: socketRef.current,
+    isConnected,
+    newMessageFromSocket,
+    targetSocketId,
+  };
 };
 
 const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
-  const { id } = useParams();
-  const friendId = id;
-  const { socket, isConnected, newMessageFromServer } = useSocket(
-    currentUser,
-    friendId,
-  );
-
   const [message, setMessage] = useState<string>("");
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
   const [myFile, setMyFile] = useState<string>("");
@@ -75,13 +80,15 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
 
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [message]);
+  const { id } = useParams();
+  const friendId = id;
 
+  const { socket, isConnected, newMessageFromSocket, targetSocketId } =
+    useSocket(currentUser, friendId);
+
+  // Send a new message to the server
   const { mutate } = useMutation({
     mutationKey: ["send_message"],
-
     mutationFn: async (newMessage: object) => {
       const { data: message } = await axios.post("/api/messages", newMessage, {
         baseURL: process.env.NEXTAUTH_URL,
@@ -90,19 +97,17 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     },
 
     onError: (error, newMessage, context: any) => {
-      // Revert the optimistic update if the mutation fails
       if (context?.previousData) {
         queryClient.setQueryData(["fetch_messages"], context.previousData);
       }
     },
   });
 
+  // Optimistically update messages by the socket server
   useEffect(() => {
     if (isConnected && socket) {
-      console.log(newMessageFromServer);
-
       const newMessageWithId = {
-        ...newMessageFromServer,
+        ...newMessageFromSocket,
         id: Math.random().toString(36).substring(2, 15),
       };
 
@@ -113,9 +118,9 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             ...oldData,
             pages: [
               {
-                messages: [newMessageWithId], // Add the new message to the first page
+                messages: [newMessageWithId],
               },
-              ...oldData.pages, // Preserve the existing pages
+              ...oldData.pages,
             ],
           };
         }
@@ -123,30 +128,64 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         return {
           pages: [
             {
-              messages: [newMessageWithId], // Add the new message as the only item in pages
+              messages: [newMessageWithId],
             },
           ],
         };
       });
-
-      // setChats((prev: any) => {
-      //   return [...prev, newMessageFromServer];
-      // });
     }
+  }, [newMessageFromSocket]);
 
-    // console.log(chats);
-  }, [newMessageFromServer]);
+  useEffect(() => {
+    console.log(targetSocketId);
+  }, [targetSocketId]);
 
+  // Optimistically update messages by the user message
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message) {
-      mutate({
-        message,
-        senderId: currentUser,
-        receiverId: friendId,
-        type: "text",
-      });
 
+    scrollToBottom();
+
+    const newMessagess = {
+      message,
+      senderId: currentUser,
+      receiverId: friendId,
+      type: "text",
+    };
+
+    if (message) {
+      mutate(newMessagess);
+
+      if (!targetSocketId) {
+        const newMessageWithId = {
+          ...newMessagess,
+          id: Math.random().toString(36).substring(2, 15),
+        };
+
+        queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
+          if (oldData?.pages) {
+            return {
+              ...oldData,
+              pages: [
+                {
+                  messages: [newMessageWithId],
+                },
+                ...oldData.pages,
+              ],
+            };
+          }
+
+          return {
+            pages: [
+              {
+                messages: [newMessageWithId],
+              },
+            ],
+          };
+        });
+      }
+
+      // Calling the socket server after the button has been clicked
       if (isConnected && socket) {
         socket.emit("newMessage", {
           message,
@@ -160,6 +199,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     setEmojiPlate(false);
   };
 
+  // this method is disabled
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
@@ -175,6 +215,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
   };
 
+  // this method is disabled
   const handleFileUpload = () => {
     if (myFile) {
       mutate({
@@ -200,7 +241,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
               hidden
               type="file"
               accept="image/jpeg, image/png"
-              onChange={handleFileChange}
+              // onChange={handleFileChange}
             />
           </label>
           <input
@@ -251,7 +292,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
           <img src={myFile} alt="file" className="h-full w-full" />
           <div className="flex flex-row-reverse items-center gap-2 py-2">
             <div
-              onClick={handleFileUpload}
+              // onClick={handleFileUpload}
               className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-zinc-200"
             >
               <IoMdSend size={18} />
