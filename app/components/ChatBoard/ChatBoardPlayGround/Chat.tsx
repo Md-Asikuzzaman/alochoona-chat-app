@@ -5,6 +5,9 @@ import { NextPage } from "next";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { MdDelete } from "react-icons/md";
+import moment from "moment";
+
+import { formatDistanceToNow } from "date-fns";
 
 interface Props {
   data: MessageType;
@@ -36,8 +39,8 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
       )}
     >
       {/* main chat */}
-      <div className="group/item flex max-w-[90%] items-center gap-1">
-        <div
+      <div className="group/item flex max-w-[90%] flex-col">
+        {/* <div
           onClick={() => {}}
           className={clsx(
             "grid h-6 w-6 shrink-0 translate-x-10 cursor-pointer place-content-center rounded-full bg-zinc-300  transition-transform group-hover/item:translate-x-0",
@@ -45,24 +48,42 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
           )}
         >
           <MdDelete className="text-zinc-500" />
-        </div>
+        </div> */}
 
         {/* SETUP for [text] type data */}
         {data.type === "text" && (
           <div
             className={clsx(
-              "z-20 inline-block px-4 py-3",
-              currentUser === data.senderId
-                ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
-                : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
+              "flex",
+              currentUser === data.senderId ? "justify-end" : "justify-start",
             )}
           >
-            <p>{data.message}</p>
+            <p
+              className={clsx(
+                "z-20 flex px-4 py-3",
+                currentUser === data.senderId
+                  ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
+                  : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
+              )}
+            >
+              {data.message}
+            </p>
           </div>
         )}
 
+        <div
+          className={clsx(
+            "flex w-full shrink-0",
+            currentUser === data.senderId ? "justify-end" : "justify-start",
+          )}
+        >
+          <p className="mt-[2px] text-[11px] text-zinc-400">
+            {moment(data.createdAt).format("llll")}
+          </p>
+        </div>
+
         {/* SETUP for [file] type data */}
-        {data.type === "file" && (
+        {/* {data.type === "file" && (
           <div
             className={clsx(
               "z-20 inline-block overflow-hidden",
@@ -73,7 +94,7 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
           >
             <img src={data.message} height={200} width={200} />
           </div>
-        )}
+        )} */}
       </div>
     </motion.div>
   );

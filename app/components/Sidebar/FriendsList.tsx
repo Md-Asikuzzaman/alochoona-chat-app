@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Avatar from "react-avatar";
 
@@ -14,16 +14,34 @@ import { IoClose } from "react-icons/io5";
 import { useFriendListActive } from "@/lib/store";
 import { LuLoader2 } from "react-icons/lu";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { NextPage } from "next";
+import { useSocket } from "../providers/SocketProvider";
 
-const FriendsList = () => {
+interface Props {
+  userId: string | undefined;
+}
+
+const FriendsList: NextPage<Props> = ({ userId }) => {
+  const [activeUsers, setActiveUser] = useState<any>();
+  const { socket } = useSocket();
+
   const params = useParams();
   const { id } = params;
-
   const receiverId = id as string;
 
   const { data } = useSession();
   const user = data?.user as SessionType;
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("registerUser", userId);
+
+      socket.on("updateUsers", (data) => {
+        setActiveUser(data);
+      });
+    }
+  }, [socket]);
 
   const {
     data: users,
@@ -65,7 +83,7 @@ const FriendsList = () => {
 
   const filteredUsers = users?.pages.map(
     (page: any) =>
-      page && page.users.filter((fu: UserType) => fu.id !== user?.id),
+      page && page.users.filter((fu: UserType) => fu.id !== userId),
   );
 
   return (
@@ -94,16 +112,22 @@ const FriendsList = () => {
           {/* chats */}
           {isPending
             ? [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => <FriendSkeleton key={i} />)
-            : filteredUsers
-                ?.flat()
-                ?.map((user: UserType) => (
+            : filteredUsers?.flat()?.map((user: UserType) => {
+                // find just active user
+                const isOnline = activeUsers?.find(
+                  (users: any) => users.userId === user.id,
+                );
+
+                return (
                   <Friend
                     key={user.id}
                     setFriendListActive={setFriendListActive}
                     user={user}
                     receiverId={receiverId}
+                    isOnline={isOnline}
                   />
-                ))}
+                );
+              })}
 
           {hasNextPage && !isPending && (
             <div className="mt-3 flex justify-center">

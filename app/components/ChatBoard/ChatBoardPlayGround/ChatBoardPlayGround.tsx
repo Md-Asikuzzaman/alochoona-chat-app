@@ -12,6 +12,8 @@ import { LuLoader2 } from "react-icons/lu";
 
 import Chat from "./Chat";
 import ChatSkeleton from "./ChatSkeleton";
+import TypingIndicator from "../../ui/TypingIndicator";
+import { useTyping } from "@/lib/store";
 
 interface Props {
   currentUser: string;
@@ -58,8 +60,6 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
     enabled: currentUser && friendId ? true : false,
   });
 
-  console.log(messages);
-
   // scroll inView
   const { ref, inView, entry } = useInView({
     threshold: 0,
@@ -83,7 +83,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
   return (
     <div
       ref={scrollRef}
-      className="flex h-[calc(100dvh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 py-2"
+      className="flex h-[calc(100dvh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 pb-8 pt-2"
     >
       <AnimatePresence mode="popLayout">
         {messages?.pages.map((page: any) =>
@@ -104,6 +104,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
           <LuLoader2 className="animate-spin text-violet-500" size={22} />
         </div>
       )}
+
     </div>
   );
 };

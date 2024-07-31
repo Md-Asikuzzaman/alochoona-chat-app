@@ -29,8 +29,8 @@ const ChatClient: NextPage<Props> = ({ currentUser }) => {
     <>
       {/* chat board header */}
       <ChatBoardHeader />
-
       {/* chat board */}
+
       <ChatBoardPlayGround currentUser={currentUser} scrollRef={scrollRef} />
 
       {/* chat board form */}

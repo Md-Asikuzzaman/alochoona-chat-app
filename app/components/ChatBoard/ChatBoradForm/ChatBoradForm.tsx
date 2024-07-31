@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,6 +15,8 @@ import EmojiPlate from "./EmojiPlate";
 import { _64ify } from "next-file-64ify";
 
 import { useSocket } from "../../providers/SocketProvider";
+import { useTyping } from "@/lib/store";
+import TypingIndicator from "../../ui/TypingIndicator";
 
 interface Props {
   currentUser: string;
@@ -29,6 +31,8 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [fileModal, setFileModal] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
   const [friendOnline, setFriendOnline] = useState<boolean>(false);
+
+  const { setIsTyping, isTyping } = useTyping();
 
   const queryClient = useQueryClient();
 
@@ -63,28 +67,24 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       socket.on("updateUsers", (data) => {
         console.log(data);
 
-        const isFriendOnline = data.some((d: any) => d.userId === friendId);
+        const isFriendOnline = data?.some((d: any) => d.userId === friendId);
         setFriendOnline(isFriendOnline);
       });
     }
   }, [socket, friendId]);
 
+  // is friend typing
   useEffect(() => {
     if (socket) {
-      socket.emit("findFriendSocket", friendId);
-
-      socket.on("friendOnline", (data) => {
-        // setFriendOnline(true);
-
-        console.log("has friend connected");
-      });
-
-      socket.on("friendOffline", (data) => {
-        // setFriendOnline(false);
-        console.log("noooooo has friend connected");
+      socket.on("typing", ({ typing }) => {
+        if (typing) {
+          setIsTyping(typing);
+        } else {
+          setIsTyping(typing);
+        }
       });
     }
-  }, [socket, friendId]);
+  }, [socket]);
 
   // [ server ] Send a new message to the server
   const { mutate } = useMutation({
@@ -193,10 +193,26 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     setMessage("");
     setEmojiPlate(false);
 
+    if (socket) {
+      socket.emit("isTyping", { friendId, typing: false });
+    }
+
     scrollToBottom();
     setTimeout(() => {
       scrollToBottom();
     }, 1000);
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+
+    if (socket) {
+      if (e.target.value) {
+        socket.emit("isTyping", { friendId, typing: true });
+      } else {
+        socket.emit("isTyping", { friendId, typing: false });
+      }
+    }
   };
 
   return (
@@ -204,7 +220,14 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       onSubmit={handleSubmit}
       className="absolute bottom-2 left-0 right-0 z-50"
     >
-      <div className="relative flex flex-1 items-center gap-2 p-3">
+      {isTyping && (
+        <div className="flex justify-start pl-5">
+          <div>
+            <TypingIndicator />
+          </div>
+        </div>
+      )}
+      <div className="relative flex flex-1 items-center gap-2 p-3 pt-0">
         <div className="relative flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2">
           <label>
             <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-zinc-200">
@@ -222,7 +245,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             type="text"
             placeholder="Type a message here..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={handleChange}
             required
           />
           <button type="submit" hidden>
