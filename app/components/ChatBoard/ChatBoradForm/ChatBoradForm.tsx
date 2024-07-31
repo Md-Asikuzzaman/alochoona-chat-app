@@ -18,7 +18,7 @@ import { useSocket } from "../../providers/SocketProvider";
 
 interface Props {
   currentUser: string;
-  scrollToBottom: () => void;
+  scrollToBottom: () => any;
 }
 
 const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
@@ -28,10 +28,13 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [myFile, setMyFile] = useState<string>("");
   const [fileModal, setFileModal] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
+  const [friendOnline, setFriendOnline] = useState<any>();
 
   const queryClient = useQueryClient();
 
   console.log({ newMessageFromServer });
+
+  console.log({ friendOnline });
 
   const { id } = useParams();
   const friendId = id;
@@ -61,19 +64,19 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
   }, [socket, setNewMessageFromServer]);
 
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.emit("findFriendSocket", friendId);
+  useEffect(() => {
+    if (socket) {
+      socket.emit("findFriendSocket", friendId);
 
-  //     socket.on("friendOnline", (data) => {
-  //       setFriendOnline(true);
-  //     });
+      socket.on("friendOnline", (data) => {
+        setFriendOnline(data);
+      });
 
-  //     socket.on("friendOffline", (data) => {
-  //       setFriendOnline(false);
-  //     });
-  //   }
-  // }, [socket]);
+      socket.on("friendOffline", (data) => {
+        setFriendOnline(data);
+      });
+    }
+  }, [socket]);
 
   // [ server ] Send a new message to the server
   const { mutate } = useMutation({

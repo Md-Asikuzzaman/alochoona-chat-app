@@ -5,7 +5,6 @@ import ChatBoardHeader from "@/app/components/ChatBoard/ChatBoardHeader";
 import { NextPage } from "next";
 import ChatBoradForm from "@/app/components/ChatBoard/ChatBoradForm/ChatBoradForm";
 import ChatBoardPlayGround from "@/app/components/ChatBoard/ChatBoardPlayGround/ChatBoardPlayGround";
-import { io } from "socket.io-client";
 
 interface Props {
   currentUser: string | any;
