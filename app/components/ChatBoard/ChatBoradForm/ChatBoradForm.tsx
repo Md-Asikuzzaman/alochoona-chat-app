@@ -132,10 +132,10 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       });
     }
 
-    // scrollToBottom();
-    // setTimeout(() => {
-    //   scrollToBottom();
-    // }, 1000);
+    scrollToBottom();
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
   }, [newMessageFromServer]);
 
   // Optimistically update messages by the user message
