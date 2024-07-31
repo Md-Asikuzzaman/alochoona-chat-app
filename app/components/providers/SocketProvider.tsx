@@ -25,8 +25,8 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socketIo = io("http://localhost:8080");
-    // const socketIo = io("http://mychatbd.vercel.app");
+    // const socketIo = io("http://localhost:8080");
+    const socketIo = io("http://mychatbd.vercel.app");
     setSocket(socketIo);
 
     return () => {

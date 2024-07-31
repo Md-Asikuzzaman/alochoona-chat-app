@@ -28,11 +28,9 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [myFile, setMyFile] = useState<string>("");
   const [fileModal, setFileModal] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
-  const [friendOnline, setFriendOnline] = useState<any>();
+  const [friendOnline, setFriendOnline] = useState<any>(false);
 
   const queryClient = useQueryClient();
-
-  console.log({ newMessageFromServer });
 
   console.log({ friendOnline });
 
@@ -57,26 +55,37 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
     if (socket) {
       socket.emit("registerUser", userId);
+      setFriendOnline(false);
 
       socket.on("updateUsers", (data) => {
+        data.map((d: any) => {
+          if (d.userId === friendId) {
+            setFriendOnline(true);
+            console.log("yes i'm there");
+          } else {
+            setFriendOnline(false);
+            console.log("nooooooooo i'm there");
+          }
+        });
+
         console.log(data);
       });
     }
-  }, [socket, setNewMessageFromServer]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.emit("findFriendSocket", friendId);
-
-      socket.on("friendOnline", (data) => {
-        setFriendOnline(data);
-      });
-
-      socket.on("friendOffline", (data) => {
-        setFriendOnline(data);
-      });
-    }
   }, [socket]);
+
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.emit("findFriendSocket", friendId);
+
+  //     socket.on("friendOnline", (data) => {
+  //       setFriendOnline(true);
+  //     });
+
+  //     socket.on("friendOffline", (data) => {
+  //       setFriendOnline(false);
+  //     });
+  //   }
+  // }, [socket, friendId]);
 
   // [ server ] Send a new message to the server
   const { mutate } = useMutation({
@@ -124,11 +133,10 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       });
     }
 
-scrollToBottom();
-setTimeout(() => {
-scrollToBottom();
-}, 1000);
-
+    // scrollToBottom();
+    // setTimeout(() => {
+    //   scrollToBottom();
+    // }, 1000);
   }, [newMessageFromServer]);
 
   // Optimistically update messages by the user message
@@ -144,7 +152,7 @@ scrollToBottom();
 
       mutate(newMessagess);
 
-      if (false) {
+      if (!friendOnline) {
         const newMessageWithId = {
           ...newMessagess,
           id: Math.random().toString(36).substring(2, 15),
@@ -185,11 +193,10 @@ scrollToBottom();
     setMessage("");
     setEmojiPlate(false);
 
-scrollToBottom();
-setTimeout(() => {
-scrollToBottom();
-}, 1000);
-
+    scrollToBottom();
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
   };
 
   return (
