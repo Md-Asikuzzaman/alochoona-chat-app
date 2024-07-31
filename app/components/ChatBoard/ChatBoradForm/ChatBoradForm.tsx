@@ -28,7 +28,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [myFile, setMyFile] = useState<string>("");
   const [fileModal, setFileModal] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
-  const [friendOnline, setFriendOnline] = useState<any>(false);
+  const [friendOnline, setFriendOnline] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
 
@@ -55,37 +55,36 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
     if (socket) {
       socket.emit("registerUser", userId);
-      setFriendOnline(false);
-
-      socket.on("updateUsers", (data) => {
-        data.map((d: any) => {
-          if (d.userId === friendId) {
-            setFriendOnline(true);
-            console.log("yes i'm there");
-          } else {
-            setFriendOnline(false);
-            console.log("nooooooooo i'm there");
-          }
-        });
-
-        console.log(data);
-      });
     }
   }, [socket]);
 
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.emit("findFriendSocket", friendId);
+  useEffect(() => {
+    if (socket) {
+      socket.on("updateUsers", (data) => {
+        console.log(data);
 
-  //     socket.on("friendOnline", (data) => {
-  //       setFriendOnline(true);
-  //     });
+        const isFriendOnline = data.some((d: any) => d.userId === friendId);
+        setFriendOnline(isFriendOnline);
+      });
+    }
+  }, [socket, friendId]);
 
-  //     socket.on("friendOffline", (data) => {
-  //       setFriendOnline(false);
-  //     });
-  //   }
-  // }, [socket, friendId]);
+  useEffect(() => {
+    if (socket) {
+      socket.emit("findFriendSocket", friendId);
+
+      socket.on("friendOnline", (data) => {
+        // setFriendOnline(true);
+
+        console.log("has friend connected");
+      });
+
+      socket.on("friendOffline", (data) => {
+        // setFriendOnline(false);
+        console.log("noooooo has friend connected");
+      });
+    }
+  }, [socket, friendId]);
 
   // [ server ] Send a new message to the server
   const { mutate } = useMutation({
@@ -152,6 +151,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
 
       mutate(newMessagess);
 
+      // only for offline mode
       if (!friendOnline) {
         const newMessageWithId = {
           ...newMessagess,
