@@ -123,6 +123,12 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         };
       });
     }
+
+scrollToBottom();
+setTimeout(() => {
+scrollToBottom();
+}, 1000);
+
   }, [newMessageFromServer]);
 
   // Optimistically update messages by the user message
@@ -138,7 +144,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
 
       mutate(newMessagess);
 
-      if (true) {
+      if (false) {
         const newMessageWithId = {
           ...newMessagess,
           id: Math.random().toString(36).substring(2, 15),
@@ -178,6 +184,12 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
     setMessage("");
     setEmojiPlate(false);
+
+scrollToBottom();
+setTimeout(() => {
+scrollToBottom();
+}, 1000);
+
   };
 
   return (
