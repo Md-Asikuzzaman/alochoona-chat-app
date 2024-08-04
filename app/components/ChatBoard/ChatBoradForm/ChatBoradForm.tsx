@@ -43,7 +43,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
 
   // socket useEffects
   const { socket } = useSocket();
-
   const userId = currentUser;
 
   useEffect(() => {
@@ -147,6 +146,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         senderId: currentUser,
         receiverId: friendId,
         type: "text",
+        createdAt: new Date().toISOString(),
       };
 
       mutate(newMessagess);
@@ -187,6 +187,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
           senderId: currentUser,
           receiverId: friendId,
           type: "text",
+          createdAt: new Date().toISOString(),
         });
       }
     }

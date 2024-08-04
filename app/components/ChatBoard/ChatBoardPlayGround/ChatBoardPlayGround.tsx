@@ -14,11 +14,24 @@ import Chat from "./Chat";
 import ChatSkeleton from "./ChatSkeleton";
 import TypingIndicator from "../../ui/TypingIndicator";
 import { useTyping } from "@/lib/store";
+import moment from "moment";
 
 interface Props {
   currentUser: string;
   scrollRef: any;
 }
+
+// Group messages by date
+const groupMessagesByDate = (messages: MessageType[]) => {
+  return messages.reduce((acc: Record<string, MessageType[]>, message) => {
+    const date = new Date(message.createdAt).toISOString().split("T")[0];
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].unshift(message);
+    return acc;
+  }, {});
+};
 
 const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
   const [userSwitch, setUserSwitch] = useState(false);
@@ -80,19 +93,36 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
     }
   }
 
+  // Message Format
+  const allMessages = messages?.pages.flatMap((page: any) => page.messages);
+
+  // Group messages by date
+  const groupedMessages = allMessages && groupMessagesByDate(allMessages);
+
   return (
     <div
       ref={scrollRef}
       className="flex h-[calc(100dvh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 pb-8 pt-2"
     >
+      {/* Chats Logic */}
       <AnimatePresence mode="popLayout">
-        {messages?.pages.map((page: any) =>
-          page.messages
-            .flat()
-            .map((data: MessageType) => (
-              <Chat key={data.id} data={data} currentUser={currentUser} />
-            )),
-        )}
+        {groupedMessages &&
+          Object.keys(groupedMessages).map((date) => (
+            <div key={date}>
+              <div className="flex items-center justify-center mt-2">
+                <p className="shrink-0 text-center text-[12px] text-gray-500 bg-gray-200 py-1 px-3 rounded-full">
+                  {moment(date).format("ll")}
+                </p>
+              </div>
+              {groupedMessages[date].map((message: MessageType) => (
+                <Chat
+                  key={message.id}
+                  data={message}
+                  currentUser={currentUser}
+                />
+              ))}
+            </div>
+          ))}
       </AnimatePresence>
 
       {hasNextPage && (
@@ -104,7 +134,6 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
           <LuLoader2 className="animate-spin text-violet-500" size={22} />
         </div>
       )}
-
     </div>
   );
 };

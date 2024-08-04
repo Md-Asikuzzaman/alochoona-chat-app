@@ -40,16 +40,6 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
     >
       {/* main chat */}
       <div className="group/item flex max-w-[90%] flex-col">
-        {/* <div
-          onClick={() => {}}
-          className={clsx(
-            "grid h-6 w-6 shrink-0 translate-x-10 cursor-pointer place-content-center rounded-full bg-zinc-300  transition-transform group-hover/item:translate-x-0",
-            currentUser === data.senderId ? "grid" : "hidden",
-          )}
-        >
-          <MdDelete className="text-zinc-500" />
-        </div> */}
-
         {/* SETUP for [text] type data */}
         {data.type === "text" && (
           <div
@@ -58,20 +48,39 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
               currentUser === data.senderId ? "justify-end" : "justify-start",
             )}
           >
-            <p
+            <div
               className={clsx(
-                "z-20 flex px-4 py-3",
+                "relative z-20 my-1 flex  items-end",
+                data.message.length <= 25 ? "flex-row" : "flex-col",
                 currentUser === data.senderId
                   ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
                   : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
               )}
             >
-              {data.message}
-            </p>
+              <p
+                className={clsx(
+                  "px-[14px] pt-[11px]",
+                  data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
+                )}
+              >
+                {data.message}
+              </p>
+
+              <p
+                className={clsx(
+                  "pb-1 pr-3 text-[11px]",
+                  currentUser === data.senderId
+                    ? "text-gray-200"
+                    : "text-[#8318b4c7]",
+                )}
+              >
+                {moment(data.createdAt).format("LT")}
+              </p>
+            </div>
           </div>
         )}
 
-        <div
+        {/* <div
           className={clsx(
             "flex w-full shrink-0",
             currentUser === data.senderId ? "justify-end" : "justify-start",
@@ -80,7 +89,7 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
           <p className="mt-[2px] text-[11px] text-zinc-400">
             {moment(data.createdAt).format("llll")}
           </p>
-        </div>
+        </div> */}
 
         {/* SETUP for [file] type data */}
         {/* {data.type === "file" && (
