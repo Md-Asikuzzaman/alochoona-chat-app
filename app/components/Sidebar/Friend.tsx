@@ -34,7 +34,7 @@ const Friend: NextPage<Props> = ({
             className={clsx(
               "absolute bottom-0 right-0 inline-block h-[12px] w-[12px] rounded-full border-2 border-white shadow-lg",
 
-              isOnline ? "bg-green-500" : "bg-zinc-400",
+              isOnline ? "bg-[#00DC96]" : "bg-zinc-400",
             )}
           ></span>
         </div>
@@ -54,8 +54,10 @@ const Friend: NextPage<Props> = ({
           <div className="flex items-center gap-2">
             <p
               className={clsx(
-                "group-hover:text-[rgba(255,255,255,0.80)] text-xs",
-                receiverId === id ? "text-[rgba(255,255,255,0.80)]" : "text-[rgba(22,44,77,0.80)]",
+                "text-xs group-hover:text-[rgba(255,255,255,0.80)]",
+                receiverId === id
+                  ? "text-[rgba(255,255,255,0.80)]"
+                  : "text-[rgba(22,44,77,0.80)]",
               )}
             >
               {isOnline ? "Online" : "Offline"}

@@ -20,18 +20,16 @@ import { useSocket } from "../providers/SocketProvider";
 
 interface Props {
   userId: string | undefined;
+  userName: string | undefined;
 }
 
-const FriendsList: NextPage<Props> = ({ userId }) => {
+const FriendsList: NextPage<Props> = ({ userId, userName }) => {
   const [activeUsers, setActiveUser] = useState<any>();
   const { socket } = useSocket();
 
   const params = useParams();
   const { id } = params;
   const receiverId = id as string;
-
-  const { data } = useSession();
-  const user = data?.user as SessionType;
 
   useEffect(() => {
     if (socket) {
@@ -95,11 +93,14 @@ const FriendsList: NextPage<Props> = ({ userId }) => {
           : "translate-x-0",
       )}
     >
-      <h3 className="mb-1 flex items-center gap-3 px-4 py-3 text-2xl font-semibold text-black">
-        <Avatar name={user?.username} size="35" round={true} />
-        Friends List
+      <h3 className="mb-1 flex items-center gap-3 px-4 py-3 text-xl font-semibold text-black">
+        <Avatar name={userName} size="35" round={true} />
+        {userName}
       </h3>
-      <div className="relative h-[calc(100vh-60px)]">
+
+      <h2 className="mb-4 px-4 text-xl font-semibold">Friends List</h2>
+
+      <div className="relative h-[calc(100vh-85px)]">
         {/* close button*/}
         <div
           onClick={() => setFriendListActive()}
