@@ -100,7 +100,7 @@ const FriendsList: NextPage<Props> = ({ userId, userName }) => {
 
       <h2 className="mb-4 px-4 text-xl font-semibold">Friends List</h2>
 
-      <div className="relative h-[calc(100vh-85px)]">
+      <div className="relative h-[calc(100vh-110px)]">
         {/* close button*/}
         <div
           onClick={() => setFriendListActive()}
