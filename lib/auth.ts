@@ -66,6 +66,18 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Ensure cookies are sent over HTTPS
+        sameSite: "None", // Required for cross-site cookies
+        path: "/",
+      },
+    },
+  },
+
   pages: {
     signIn: "/signin",
     signOut: "/",
