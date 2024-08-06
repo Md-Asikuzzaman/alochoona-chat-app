@@ -1,6 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
 import prisma from "./db";
 
 export const authOptions: NextAuthOptions = {
@@ -20,23 +19,20 @@ export const authOptions: NextAuthOptions = {
           placeholder: "Password",
         },
       },
-
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials!");
         }
 
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
 
         if (!user || !user.password) {
           throw new Error("Invalid credentials!");
         }
 
-        const isCorrectPassword = credentials.password == user.password;
+        const isCorrectPassword = credentials.password === user.password;
 
         if (!isCorrectPassword) {
           throw new Error("Invalid credentials!");
@@ -46,31 +42,25 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (trigger === "update") {
         return { ...token, ...session.user };
       }
-
       return { ...token, ...user };
     },
-
     async session({ session, token }) {
       session.user = token as any;
       return session;
     },
   },
-
   session: {
     strategy: "jwt",
   },
-
   pages: {
     signIn: "/signin",
     signOut: "/",
   },
-
   cookies: {
     sessionToken: {
       name: `__Secure-next-auth.session-token`,
@@ -100,6 +90,5 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
-
   secret: process.env.NEXTAUTH_SECRET,
 };
