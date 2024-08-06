@@ -93,22 +93,24 @@ const FriendsList: NextPage<Props> = ({ userId, userName }) => {
           : "translate-x-0",
       )}
     >
-      <h3 className="mb-1 flex items-center gap-3 px-4 py-3 text-xl font-semibold text-black">
-        <Avatar name={userName} size="35" round={true} />
-        {userName}
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="mb-1 flex items-center gap-3 px-4 py-3 text-xl font-semibold text-black">
+          <Avatar name={userName} size="35" round={true} />
+          {userName}
+        </h3>
+
+        {/* close button*/}
+        <div
+          onClick={() => setFriendListActive()}
+          className="mr-3 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-rose-200 lg:hidden"
+        >
+          <IoClose size={22} />
+        </div>
+      </div>
 
       <h2 className="mb-4 px-4 text-xl font-semibold">Friends List</h2>
 
       <div className="relative h-[calc(100vh-110px)]">
-        {/* close button*/}
-        <div
-          onClick={() => setFriendListActive()}
-          className="absolute right-0 flex h-10 w-10 -translate-y-[50px] translate-x-1/2 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:bg-rose-200 lg:hidden"
-        >
-          <IoClose size={20} />
-        </div>
-
         <div className="flex h-full flex-col gap-3 overflow-y-scroll px-4 pb-4">
           {/* chats */}
           {isPending
