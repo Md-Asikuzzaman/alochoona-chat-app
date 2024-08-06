@@ -110,7 +110,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
           Object.keys(groupedMessages).map((date) => (
             <div key={date}>
               <div className="my-2 flex items-center justify-center">
-                <p className="shrink-0 rounded-full bg-gray-200 px-3 py-1 text-center text-[12px] text-gray-500">
+                <p className="shrink-0 rounded-full bg-[#ebe8ff] px-3 py-1 text-center text-[12px] text-[rgba(113,62,255,0.80)]">
                   {moment(date).format("ll")}
                 </p>
               </div>
@@ -131,7 +131,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
           onClick={() => fetchNextPage()}
           className="flex justify-center"
         >
-          <LuLoader2 className="animate-spin text-violet-500" size={22} />
+          <LuLoader2 className="animate-spin text-[#703eff]" size={22} />
         </div>
       )}
     </div>

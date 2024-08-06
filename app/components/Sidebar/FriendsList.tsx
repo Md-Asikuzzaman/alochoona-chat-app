@@ -89,7 +89,7 @@ const FriendsList: NextPage<Props> = ({ userId }) => {
   return (
     <div
       className={clsx(
-        "hiddedn 0 absolute left-0 top-0 z-[9999999] w-[88%] bg-white shadow-lg transition-transform sm:w-[85%] md:w-[70%] lg:relative lg:w-[390px] lg:shadow-none",
+        "hiddedn 0 absolute left-0 top-0 z-[9999999] w-[88%] bg-[#EDE9FC] shadow-lg transition-transform sm:w-[85%] md:w-[70%] lg:relative lg:w-[390px] lg:shadow-none",
         friendListActive
           ? "-translate-x-[110%] lg:translate-x-0"
           : "translate-x-0",
@@ -134,7 +134,7 @@ const FriendsList: NextPage<Props> = ({ userId }) => {
               <button
                 ref={ref}
                 onClick={() => fetchNextPage()}
-                className="mx-auto inline-flex shrink-0 items-end gap-1 rounded-full bg-violet-500 px-3 py-2 text-xs text-white"
+                className="mx-auto inline-flex shrink-0 items-end gap-1 rounded-full bg-[#703EFF] px-3 py-2 text-xs text-white"
               >
                 {isFetchingNextPage && (
                   <LuLoader2 className="animate-spin" size={18} />

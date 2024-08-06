@@ -53,11 +53,16 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
                 "relative z-20 my-1 flex  items-end",
                 data.message.length <= 25 ? "flex-row" : "flex-col",
                 currentUser === data.senderId
-                  ? "rounded-b-2xl rounded-s-2xl bg-[#6918b4] text-white"
-                  : "rounded-b-2xl rounded-e-2xl bg-[#E1D1F0] text-[#8318b4]",
+                  ? "rounded-b-2xl rounded-s-2xl bg-[#703EFF] text-white"
+                  : "rounded-b-2xl rounded-e-2xl bg-white text-[#162C4D]",
               )}
             >
               <p
+                style={
+                  data.message.length >= 100
+                    ? { inlineSize: "100%", wordBreak: "break-word" }
+                    : {}
+                }
                 className={clsx(
                   "px-[14px] pt-[11px]",
                   data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
@@ -70,8 +75,8 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
                 className={clsx(
                   "pb-1 pr-3 text-[11px]",
                   currentUser === data.senderId
-                    ? "text-gray-200"
-                    : "text-[#8318b4c7]",
+                    ? "text-[rgba(255,255,255,0.85)]"
+                    : "text-[rgba(22,44,77,0.85)]",
                 )}
               >
                 {moment(data.createdAt).format("LT")}

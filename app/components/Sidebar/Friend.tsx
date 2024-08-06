@@ -23,8 +23,8 @@ const Friend: NextPage<Props> = ({
     <Link onClick={() => setFriendListActive()} href={`/chat/${id}`}>
       <div
         className={clsx(
-          "flex items-center justify-between gap-4 rounded-xl  p-4 hover:bg-[#E1D1F0]",
-          receiverId === id ? "bg-[#E1D1F0]" : "bg-zinc-100",
+          "group flex items-center justify-between gap-4  rounded-xl p-4 hover:bg-[#703EFF]",
+          receiverId === id ? "bg-[#703EFF]" : "bg-[#fff]",
         )}
       >
         <div className="relative">
@@ -41,12 +41,23 @@ const Friend: NextPage<Props> = ({
 
         <div className="flex-1 truncate">
           <div className="flex items-center justify-between">
-            <h4 className={`font-semibold text-[#8318b4]`}>{username}</h4>
-            {/* <span className={`text-xs text-[#8318b4]/70`}>3:00 PM</span> */}
+            <h4
+              className={clsx(
+                " font-semibold group-hover:text-[#fff]",
+                receiverId === id ? "text-[#fff]" : "text-[#162C4D]",
+              )}
+            >
+              {username}
+            </h4>
           </div>
 
           <div className="flex items-center gap-2">
-            <p className="text-xs text-zinc-500">
+            <p
+              className={clsx(
+                "group-hover:text-[rgba(255,255,255,0.80)] text-xs",
+                receiverId === id ? "text-[rgba(255,255,255,0.80)]" : "text-[rgba(22,44,77,0.80)]",
+              )}
+            >
               {isOnline ? "Online" : "Offline"}
             </p>
           </div>

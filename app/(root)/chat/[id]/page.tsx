@@ -8,7 +8,7 @@ const Page: NextPage<Props> = async ({}) => {
   const currentUser = await getCurrentUser();
 
   return (
-    <div className="relative flex h-full flex-1 flex-col">
+    <div className="relative flex h-full flex-1 flex-col bg-[#F4F4FA]">
       <ChatClient currentUser={currentUser?.id} />
     </div>
   );

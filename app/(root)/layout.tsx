@@ -12,7 +12,7 @@ const Layout: NextPage<Props> = async ({ children }) => {
   return (
     <section className="h-[100dvh] w-full overflow-hidden">
       <div className="mx-auto lg:container">
-        <div className="flex h-[100dvh] flex-1 bg-gray-100 lg:overflow-hidden lg:rounded-xl">
+        <div className="flex h-[100dvh] flex-1 lg:overflow-hidden lg:rounded-xl">
           <FriendList userId={userId} />
           <div className="flex-1">{children}</div>
         </div>
