@@ -102,15 +102,15 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
   return (
     <div
       ref={scrollRef}
-      className="flex h-[calc(100dvh-160px)] flex-col-reverse gap-2 overflow-x-hidden overflow-y-scroll px-5 pb-8 pt-2"
+      className="flex h-[calc(100dvh-160px)] flex-col-reverse overflow-x-hidden overflow-y-scroll px-5 pt-2"
     >
       {/* Chats Logic */}
       <AnimatePresence mode="popLayout">
         {groupedMessages &&
           Object.keys(groupedMessages).map((date) => (
             <div key={date}>
-              <div className="flex items-center justify-center mt-2">
-                <p className="shrink-0 text-center text-[12px] text-gray-500 bg-gray-200 py-1 px-3 rounded-full">
+              <div className="my-2 flex items-center justify-center">
+                <p className="shrink-0 rounded-full bg-gray-200 px-3 py-1 text-center text-[12px] text-gray-500">
                   {moment(date).format("ll")}
                 </p>
               </div>
