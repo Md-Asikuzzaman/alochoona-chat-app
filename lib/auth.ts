@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
       options: {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // Ensure this is true in production
-        sameSite: "None", // Required for cross-site cookies
+        sameSite: "None", // Required for cross-site cookie
         path: "/",
       },
     },
