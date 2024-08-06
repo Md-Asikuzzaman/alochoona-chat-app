@@ -66,21 +66,39 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 
+  pages: {
+    signIn: "/signin",
+    signOut: "/",
+  },
+
   cookies: {
     sessionToken: {
       name: `__Secure-next-auth.session-token`,
       options: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Ensure cookies are sent over HTTPS
+        secure: process.env.NODE_ENV === "production", // Ensure this is true in production
         sameSite: "None", // Required for cross-site cookies
         path: "/",
       },
     },
-  },
-
-  pages: {
-    signIn: "/signin",
-    signOut: "/",
+    csrfToken: {
+      name: `__Host-next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Ensure this is true in production
+        sameSite: "None", // Required for cross-site cookies
+        path: "/",
+      },
+    },
+    callbackUrl: {
+      name: `__Secure-next-auth.callback-url`,
+      options: {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production", // Ensure this is true in production
+        sameSite: "None", // Required for cross-site cookies
+        path: "/",
+      },
+    },
   },
 
   secret: process.env.NEXTAUTH_SECRET,
