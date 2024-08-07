@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -20,7 +20,6 @@ interface Props {
   currentUser: string;
   scrollRef: any;
   scrollToTyping: () => void;
-  scrollToBottom: () => void;
 }
 
 // Group messages by date
@@ -39,7 +38,6 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   currentUser,
   scrollRef,
   scrollToTyping,
-  scrollToBottom,
 }) => {
   const { id: friendId } = useParams<{ id: string }>();
   const { isTyping } = useTyping();
@@ -47,7 +45,6 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   useEffect(() => {
     if (isTyping) {
       scrollToTyping();
-      // scrollToBottom();
     }
   }, [isTyping]);
 

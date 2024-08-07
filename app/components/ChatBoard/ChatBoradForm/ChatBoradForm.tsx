@@ -1,21 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { NextPage } from "next";
-import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Message } from "@prisma/client";
+
 import axios from "axios";
 import clsx from "clsx";
-import { MdClose, MdEmojiEmotions } from "react-icons/md";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
+import { _64ify } from "next-file-64ify";
+
+import { MdClose, MdEmojiEmotions } from "react-icons/md";
 import { BsFillSendFill } from "react-icons/bs";
 import { FaRegImage } from "react-icons/fa6";
 import { IoMdSend } from "react-icons/io";
-import EmojiPlate from "./EmojiPlate";
-import { _64ify } from "next-file-64ify";
 
 import { useSocket } from "../../providers/SocketProvider";
 import { useTyping } from "@/lib/store";
+import EmojiPlate from "./EmojiPlate";
 
 interface Props {
   currentUser: string;
@@ -28,17 +31,15 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
 
   const [myFile, setMyFile] = useState<string>("");
   const [fileModal, setFileModal] = useState<boolean>(false);
-  const [newMessageFromServer, setNewMessageFromServer] = useState<any>();
+  const [newMessageFromServer, setNewMessageFromServer] = useState<Message>();
   const [friendOnline, setFriendOnline] = useState<boolean>(false);
 
-  const { setIsTyping, isTyping } = useTyping();
-
+  const { setIsTyping } = useTyping();
   const queryClient = useQueryClient();
 
-  console.log({ friendOnline });
+  const { id: friendId } = useParams<{ id: string }>();
 
-  const { id } = useParams();
-  const friendId = id;
+  // console.log({ friendOnline });
 
   // socket init
   const { socket } = useSocket();
@@ -47,7 +48,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   // [ useEffect ] new message from server
   useEffect(() => {
     if (socket) {
-      socket.on("newMessageFromServer", (data) => {
+      socket.on("newMessageFromServer", (data: Message) => {
         if (
           (data.receiverId === userId && data.senderId === friendId) ||
           (data.receiverId === friendId && data.senderId === userId)
@@ -203,7 +204,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }, 1000);
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
 
     if (socket) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import ChatBoardHeader from "@/app/components/ChatBoard/ChatBoardHeader";
 import { NextPage } from "next";
 import ChatBoradForm from "@/app/components/ChatBoard/ChatBoradForm/ChatBoradForm";
@@ -28,10 +28,6 @@ const ChatClient: NextPage<Props> = ({ currentUser }) => {
     if (scrollRef.current) {
       const scrollTop = scrollRef.current.scrollTop;
 
-      console.log({
-        scrollTop,
-      });
-
       if (Math.abs(scrollTop) <= 350) {
         scrollRef.current.scrollTo({
           top: scrollRef.current.scrollHeight + 200,
@@ -51,7 +47,6 @@ const ChatClient: NextPage<Props> = ({ currentUser }) => {
         currentUser={currentUser}
         scrollRef={scrollRef}
         scrollToTyping={scrollToTyping}
-        scrollToBottom={scrollToBottom}
       />
 
       {/* chat board form */}
