@@ -7,8 +7,6 @@ import clsx from "clsx";
 import { MdDelete } from "react-icons/md";
 import moment from "moment";
 
-import { formatDistanceToNow } from "date-fns";
-
 interface Props {
   data: MessageType;
   currentUser: string;
@@ -38,50 +36,41 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
         currentUser === data.senderId ? "justify-end" : "justify-start",
       )}
     >
-      {/* main chat */}
+      {/* main chat layer */}
       <div className="group/item flex max-w-[90%] flex-col">
         {/* SETUP for [text] type data */}
         {data.type === "text" && (
           <div
             className={clsx(
-              "flex",
-              currentUser === data.senderId ? "justify-end" : "justify-start",
+              "relative z-20 my-1 flex items-end",
+              data.message.length <= 25 ? "flex-row" : "flex-col",
+              currentUser === data.senderId
+                ? "rounded-b-2xl rounded-s-2xl bg-[#703EFF] text-white"
+                : "rounded-b-2xl rounded-e-2xl bg-white text-[#162C4D]",
             )}
           >
-            <div
+            {/* test message */}
+            <p
+              style={{ inlineSize: "100%", wordBreak: "break-word" }}
               className={clsx(
-                "relative z-20 my-1 flex  items-end",
-                data.message.length <= 25 ? "flex-row" : "flex-col",
-                currentUser === data.senderId
-                  ? "rounded-b-2xl rounded-s-2xl bg-[#703EFF] text-white"
-                  : "rounded-b-2xl rounded-e-2xl bg-white text-[#162C4D]",
+                "px-[14px] pt-[11px]",
+                data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
               )}
             >
-              <p
-                style={
-                  data.message.length >= 100
-                    ? { inlineSize: "100%", wordBreak: "break-word" }
-                    : {}
-                }
-                className={clsx(
-                  "px-[14px] pt-[11px]",
-                  data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
-                )}
-              >
-                {data.message}
-              </p>
+              {data.message}
+            </p>
 
-              <p
-                className={clsx(
-                  "pb-1 pr-3 text-[11px]",
-                  currentUser === data.senderId
-                    ? "text-[rgba(255,255,255,0.85)]"
-                    : "text-[rgba(22,44,77,0.85)]",
-                )}
-              >
-                {moment(data.createdAt).format("LT")}
-              </p>
-            </div>
+            {/* message date */}
+            <p
+              className={clsx(
+                "shrink-0 pb-1 pr-3 text-[11px]",
+                currentUser === data.senderId
+                  ? "text-[rgba(255,255,255,0.85)]"
+                  : "text-[rgba(22,44,77,0.85)]",
+              )}
+            >
+              {moment(data.createdAt).format("LT")}
+            </p>
           </div>
         )}
 
