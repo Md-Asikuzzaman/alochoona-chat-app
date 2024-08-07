@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
-import ChatBoardHeader from "@/app/components/ChatBoard/ChatBoardHeader";
 import { NextPage } from "next";
+import { useRef } from "react";
+
+import ChatBoardHeader from "@/app/components/ChatBoard/ChatBoardHeader";
 import ChatBoradForm from "@/app/components/ChatBoard/ChatBoradForm/ChatBoradForm";
 import ChatBoardPlayGround from "@/app/components/ChatBoard/ChatBoardPlayGround/ChatBoardPlayGround";
 

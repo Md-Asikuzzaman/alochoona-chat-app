@@ -1,5 +1,6 @@
-import getCurrentUser from "@/actions/getCurrentUser";
 import React from "react";
+
+import getCurrentUser from "@/actions/getCurrentUser";
 import HomeClient from "./HomeClient";
 
 const Home = async () => {

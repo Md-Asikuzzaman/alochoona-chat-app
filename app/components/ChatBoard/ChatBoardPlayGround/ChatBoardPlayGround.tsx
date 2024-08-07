@@ -15,24 +15,13 @@ import ChatSkeleton from "./ChatSkeleton";
 import moment from "moment";
 import TypingIndicator from "../../ui/TypingIndicator";
 import { useTyping } from "@/lib/store";
+import { groupMessagesByDate } from "@/lib/utils";
 
 interface Props {
   currentUser: string;
   scrollRef: any;
   scrollToTyping: () => void;
 }
-
-// Group messages by date
-const groupMessagesByDate = (messages: MessageType[]) => {
-  return messages.reduce((acc: Record<string, MessageType[]>, message) => {
-    const date = new Date(message.createdAt).toISOString().split("T")[0];
-    if (!acc[date]) {
-      acc[date] = [];
-    }
-    acc[date].unshift(message);
-    return acc;
-  }, {});
-};
 
 const ChatBoardPlayGround: NextPage<Props> = ({
   currentUser,

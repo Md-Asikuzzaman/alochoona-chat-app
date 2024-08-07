@@ -1,12 +1,13 @@
 "use client";
 
-import { LuMessagesSquare } from "react-icons/lu";
-import LogOutButton from "../components/ui/LogOutButton";
-import FriendListMenu from "../components/ui/FriendListMenu";
+import { NextPage } from "next";
 import { useEffect } from "react";
+
+import { LuMessagesSquare } from "react-icons/lu";
 import { useSocket } from "../components/providers/SocketProvider";
 
-import { NextPage } from "next";
+import FriendListMenu from "../components/ui/FriendListMenu";
+import LogOutButton from "../components/ui/LogOutButton";
 
 interface Props {
   userId: string | undefined;

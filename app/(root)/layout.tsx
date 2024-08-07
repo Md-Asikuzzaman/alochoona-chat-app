@@ -1,6 +1,7 @@
 import { NextPage } from "next";
-import FriendList from "../components/Sidebar/FriendsList";
+
 import getCurrentUser from "@/actions/getCurrentUser";
+import FriendList from "../components/Sidebar/FriendsList";
 interface Props {
   children: React.ReactNode;
 }

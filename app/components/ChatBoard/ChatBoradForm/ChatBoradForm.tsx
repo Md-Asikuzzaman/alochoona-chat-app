@@ -257,7 +257,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
           </div>
         </div>
         <AnimatePresence mode="wait">
-          {message.length > 0 && (
+          {message.trim().length > 0 && (
             <motion.div
               initial={{ scale: 0, height: 0, width: 0 }}
               animate={{ scale: 1, height: "40px", width: "40px" }}

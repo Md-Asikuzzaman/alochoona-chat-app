@@ -4,13 +4,12 @@ import clsx from "clsx";
 import { NextPage } from "next";
 import Link from "next/link";
 import Avatar from "react-avatar";
-// import { MdMarkChatUnread } from "react-icons/md";
 
 interface Props {
   user: UserType;
   receiverId: string;
-  setFriendListActive: () => void;
   isOnline: boolean;
+  setFriendListActive: () => void;
 }
 
 const Friend: NextPage<Props> = ({
