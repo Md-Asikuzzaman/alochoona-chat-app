@@ -1,7 +1,7 @@
 "use client";
 
 import { NextPage } from "next";
-import { ForwardedRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -12,13 +12,15 @@ import { LuLoader2 } from "react-icons/lu";
 
 import Chat from "./Chat";
 import ChatSkeleton from "./ChatSkeleton";
+import moment from "moment";
 import TypingIndicator from "../../ui/TypingIndicator";
 import { useTyping } from "@/lib/store";
-import moment from "moment";
 
 interface Props {
   currentUser: string;
   scrollRef: any;
+  scrollToTyping: () => void;
+  scrollToBottom: () => void;
 }
 
 // Group messages by date
@@ -33,17 +35,23 @@ const groupMessagesByDate = (messages: MessageType[]) => {
   }, {});
 };
 
-const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
-  const [userSwitch, setUserSwitch] = useState(false);
-
-  const { id } = useParams();
-  const friendId = id;
+const ChatBoardPlayGround: NextPage<Props> = ({
+  currentUser,
+  scrollRef,
+  scrollToTyping,
+  scrollToBottom,
+}) => {
+  const { id: friendId } = useParams<{ id: string }>();
+  const { isTyping } = useTyping();
 
   useEffect(() => {
-    setUserSwitch(true);
-  }, [friendId]);
+    if (isTyping) {
+      scrollToTyping();
+      // scrollToBottom();
+    }
+  }, [isTyping]);
 
-  // [ FETCH ] data based on receiverID and senderID
+  // [ FETCH ] messages based on receiverID and senderID
   const {
     data: messages,
     fetchNextPage,
@@ -87,16 +95,14 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
   // loading indicator
   if (!isFetchingNextPage) {
     if (isPending || isFetching) {
-      if (userSwitch) {
-        return <ChatSkeleton />;
-      }
+      return <ChatSkeleton />;
     }
   }
 
-  // Message Format
+  // messages format
   const allMessages = messages?.pages.flatMap((page: any) => page.messages);
 
-  // Group messages by date
+  // group messages by date
   const groupedMessages = allMessages && groupMessagesByDate(allMessages);
 
   return (
@@ -104,11 +110,17 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
       ref={scrollRef}
       className="flex h-[calc(100dvh-160px)] flex-col-reverse overflow-x-hidden overflow-y-scroll px-5 pt-2"
     >
-      {/* Chats Logic */}
+      {/* chats Logic */}
       <AnimatePresence mode="popLayout">
+        {/* typing indicator */}
+        {isTyping && (
+          <div className="mt-1 flex justify-start">
+            <TypingIndicator />
+          </div>
+        )}
         {groupedMessages &&
-          Object.keys(groupedMessages).map((date) => (
-            <div key={date}>
+          Object.keys(groupedMessages).map((date, i) => (
+            <div key={i}>
               <div className="my-2 flex items-center justify-center">
                 <p className="shrink-0 rounded-full bg-[#ebe8ff] px-3 py-1 text-center text-[12px] text-[rgba(113,62,255,0.80)]">
                   {moment(date).format("ll")}
@@ -124,6 +136,8 @@ const ChatBoardPlayGround: NextPage<Props> = ({ currentUser, scrollRef }) => {
             </div>
           ))}
       </AnimatePresence>
+
+      {/* next page loading indicator */}
 
       {hasNextPage && (
         <div

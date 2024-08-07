@@ -16,7 +16,6 @@ import { _64ify } from "next-file-64ify";
 
 import { useSocket } from "../../providers/SocketProvider";
 import { useTyping } from "@/lib/store";
-import TypingIndicator from "../../ui/TypingIndicator";
 
 interface Props {
   currentUser: string;
@@ -41,10 +40,11 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const { id } = useParams();
   const friendId = id;
 
-  // socket useEffects
+  // socket init
   const { socket } = useSocket();
   const userId = currentUser;
 
+  // [ useEffect ] new message from server
   useEffect(() => {
     if (socket) {
       socket.on("newMessageFromServer", (data) => {
@@ -61,18 +61,17 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
   }, [socket]);
 
+  // [ useEffect ] update user
   useEffect(() => {
     if (socket) {
       socket.on("updateUsers", (data) => {
-        console.log(data);
-
         const isFriendOnline = data?.some((d: any) => d.userId === friendId);
         setFriendOnline(isFriendOnline);
       });
     }
   }, [socket, friendId]);
 
-  // is friend typing
+  // [ useEffect ] is user typing
   useEffect(() => {
     if (socket) {
       socket.on("typing", ({ typing }) => {
@@ -221,13 +220,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
       onSubmit={handleSubmit}
       className="absolute bottom-2 left-0 right-0 z-50"
     >
-      {isTyping && (
-        <div className="flex justify-start pl-5">
-          <div>
-            <TypingIndicator />
-          </div>
-        </div>
-      )}
       <div className="relative flex flex-1 items-center gap-2 p-3 pt-0">
         <div className="relative flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2">
           <label>

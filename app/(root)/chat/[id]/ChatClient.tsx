@@ -24,14 +24,35 @@ const ChatClient: NextPage<Props> = ({ currentUser }) => {
     }
   };
 
-  // socket connection
+  const scrollToTyping = () => {
+    if (scrollRef.current) {
+      const scrollTop = scrollRef.current.scrollTop;
+
+      console.log({
+        scrollTop,
+      });
+
+      if (Math.abs(scrollTop) <= 350) {
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight + 200,
+          behavior: "smooth",
+        });
+      }
+    }
+  };
+
   return (
     <>
       {/* chat board header */}
       <ChatBoardHeader />
       {/* chat board */}
 
-      <ChatBoardPlayGround currentUser={currentUser} scrollRef={scrollRef} />
+      <ChatBoardPlayGround
+        currentUser={currentUser}
+        scrollRef={scrollRef}
+        scrollToTyping={scrollToTyping}
+        scrollToBottom={scrollToBottom}
+      />
 
       {/* chat board form */}
       <ChatBoradForm

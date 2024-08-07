@@ -15,8 +15,6 @@ interface Props {
 const HomeClient: NextPage<Props> = ({ userId }) => {
   const { socket } = useSocket();
 
-  //   console.log(userId);
-
   useEffect(() => {
     if (socket) {
       socket.emit("registerUser", userId);
