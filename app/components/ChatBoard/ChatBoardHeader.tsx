@@ -1,26 +1,24 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+
 import axios from "axios";
+import clsx from "clsx";
 import Avatar from "react-avatar";
 
+import { useQuery } from "@tanstack/react-query";
 import { CgMenuRight } from "react-icons/cg";
-
 import { useFriendListActive } from "@/lib/store";
-import LogOutButton from "../ui/LogOutButton";
-import { useParams } from "next/navigation";
-import clsx from "clsx";
-import { useEffect, useState } from "react";
+
 import { useSocket } from "../providers/SocketProvider";
+import LogOutButton from "../ui/LogOutButton";
 
 const ChatBoardHeader = () => {
-  const { id } = useParams();
-  const friendId = id;
+  const { id: friendId } = useParams<{ id: string }>();
 
   // socket useEffects
   const { socket } = useSocket();
-
-
 
   const [friendOnline, setFriendOnline] = useState<boolean>(false);
 
@@ -44,8 +42,6 @@ const ChatBoardHeader = () => {
   useEffect(() => {
     if (socket) {
       socket.on("updateUsers", (data) => {
-        console.log(data);
-
         const isFriendOnline = data.some((d: any) => d.userId === friendId);
         setFriendOnline(isFriendOnline);
       });
