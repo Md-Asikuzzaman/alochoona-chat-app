@@ -56,39 +56,16 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
   pages: {
     signIn: "/signin",
     signOut: "/",
   },
-  // cookies: {
-  //   sessionToken: {
-  //     name: `__Secure-next-auth.session-token`,
-  //     options: {
-  //       httpOnly: true,
-  //       secure: process.env.NODE_ENV === "production", // Ensure this is true in production
-  //       sameSite: "None", // Required for cross-site cookie
-  //       path: "/",
-  //     },
-  //   },
-  //   csrfToken: {
-  //     name: `__Host-next-auth.csrf-token`,
-  //     options: {
-  //       httpOnly: true,
-  //       secure: process.env.NODE_ENV === "production", // Ensure this is true in production
-  //       sameSite: "None", // Required for cross-site cookies
-  //       path: "/",
-  //     },
-  //   },
-  //   callbackUrl: {
-  //     name: `__Secure-next-auth.callback-url`,
-  //     options: {
-  //       httpOnly: false,
-  //       secure: process.env.NODE_ENV === "production", // Ensure this is true in production
-  //       sameSite: "None", // Required for cross-site cookies
-  //       path: "/",
-  //     },
-  //   },
-  // },
   secret: process.env.NEXTAUTH_SECRET,
+
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    maxAge: 24 * 60 * 60,
+  },
 };

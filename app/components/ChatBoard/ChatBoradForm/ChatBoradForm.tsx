@@ -55,9 +55,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         }
       });
     }
-    if (socket) {
-      socket.emit("registerUser", userId);
-    }
   }, [socket]);
 
   // Check is any friend is online
@@ -256,9 +253,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             placeholder="Type a message here..."
             {...register("message")}
           />
-          <button type="submit" hidden>
-            Send
-          </button>
 
           {/*  */}
           <div
@@ -273,12 +267,11 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
           </div>
         </div>
 
-        <div
-          // onClick={handlseSubmit}
-          className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200"
-        >
-          <BsFillSendFill className="shrink-0 text-violet-700" size={22} />
-        </div>
+        <button type="submit">
+          <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200">
+            <BsFillSendFill className="shrink-0 text-violet-700" size={22} />
+          </div>
+        </button>
 
         <EmojiPlate
           setValue={setValue}
