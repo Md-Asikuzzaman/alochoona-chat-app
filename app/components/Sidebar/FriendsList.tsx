@@ -10,12 +10,12 @@ import FriendSkeleton from "./FriendSkeleton";
 import clsx from "clsx";
 
 import { IoClose } from "react-icons/io5";
-import { useFriendListActive } from "@/lib/store";
 import { LuLoader2 } from "react-icons/lu";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useSocket } from "../providers/SocketProvider";
+import { useFriendListActive } from "@/app/stores/useFriendListStore";
 
 interface Props {
   userId: string | undefined;
@@ -58,7 +58,6 @@ const FriendsList: NextPage<Props> = ({ userId, userName }) => {
 
       return data;
     },
-    refetchInterval: 5000,
     initialPageParam: 1,
     getNextPageParam: (lastPage: any, allPages: any) => {
       return lastPage.users.length > 0 ? allPages.length + 1 : undefined;

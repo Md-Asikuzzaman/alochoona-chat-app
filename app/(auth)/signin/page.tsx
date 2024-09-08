@@ -65,9 +65,9 @@ const SignIn = () => {
 
   return (
     <section className="bg-zinc-200 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+      <div className="mx-auto flex h-screen flex-col items-center justify-center px-6 py-8 lg:py-0">
+        <div className="w-full rounded-lg bg-white shadow sm:max-w-md md:mt-0 xl:p-0 dark:border dark:border-gray-700 dark:bg-gray-800">
+          <div className="space-y-4 p-6 sm:p-8 md:space-y-6">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>
@@ -79,17 +79,18 @@ const SignIn = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Your email
                 </label>
+
                 <input
                   type="email"
                   name="email"
                   id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:outline-violet-600 block w-full p-2.5"
-                  placeholder="example@gmail.com"
                   required
+                  placeholder="example@gmail.com"
+                  className="input input-bordered w-full"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -97,31 +98,32 @@ const SignIn = () => {
               <div>
                 <label
                   htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Password
                 </label>
+
                 <input
                   type="password"
                   name="password"
                   id="password"
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:outline-violet-600 block w-full p-2.5"
                   required
+                  placeholder="••••••••"
+                  className="input input-bordered w-full"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-violet-600 hover:bg-violet-700 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className="dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 w-full rounded-lg bg-violet-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-violet-700 focus:outline-none focus:ring-4 focus:ring-violet-300"
               >
                 {isLoading ? "Signing in..." : "Sign in"}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don't have an account yet?{" "}
                 <Link href={"/signup"}>
-                  <span className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                  <span className="text-primary-600 dark:text-primary-500 font-medium hover:underline">
                     Sign up
                   </span>
                 </Link>

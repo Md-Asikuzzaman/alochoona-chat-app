@@ -17,8 +17,14 @@ import { FaRegImage } from "react-icons/fa6";
 import { IoMdSend } from "react-icons/io";
 
 import { useSocket } from "../../providers/SocketProvider";
-import { useTyping } from "@/lib/store";
 import EmojiPlate from "./EmojiPlate";
+import { useTyping } from "@/app/stores/useTypeStore";
+
+// Form validation
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { messageSchema } from "@/app/schemas/messageSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Props {
   currentUser: string;
@@ -26,26 +32,18 @@ interface Props {
 }
 
 const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
-  const [message, setMessage] = useState<string>("");
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
-
-  const [myFile, setMyFile] = useState<string>("");
-  const [fileModal, setFileModal] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<Message>();
   const [friendOnline, setFriendOnline] = useState<boolean>(false);
 
-  const { setIsTyping } = useTyping();
-  const queryClient = useQueryClient();
-
   const { id: friendId } = useParams<{ id: string }>();
-
-  // console.log({ friendOnline });
-
-  // socket init
-  const { socket } = useSocket();
   const userId = currentUser;
 
-  // [ useEffect ] new message from server
+  const queryClient = useQueryClient();
+  const { socket } = useSocket();
+  const { setIsTyping } = useTyping();
+
+  // Comming new message from Socket server
   useEffect(() => {
     if (socket) {
       socket.on("newMessageFromServer", (data: Message) => {
@@ -62,7 +60,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
   }, [socket]);
 
-  // [ useEffect ] update user
+  // Check is any friend is online
   useEffect(() => {
     if (socket) {
       socket.on("updateUsers", (data) => {
@@ -85,7 +83,9 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }
   }, [socket]);
 
-  // [ server ] Send a new message to the server
+  // ==============================================================================
+
+  // [SEND NEW MESSAGE LOGIC]
   const { mutate } = useMutation({
     mutationKey: ["send_message"],
     mutationFn: async (newMessage: object) => {
@@ -102,6 +102,83 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+  } = useForm<messageSchemaType>({ resolver: zodResolver(messageSchema) });
+  type messageSchemaType = z.infer<typeof messageSchema>;
+
+  const message = watch("message");
+
+  // Send new message to server
+  const onSubmit: SubmitHandler<messageSchemaType> = ({ message }) => {
+    if (message) {
+      const newMessagess = {
+        message,
+        senderId: currentUser,
+        receiverId: friendId,
+        type: "text",
+        createdAt: new Date().toISOString(),
+      };
+
+      mutate(newMessagess);
+
+      // Optimistically update own UI by own message if friend is offline
+      if (!friendOnline) {
+        const newMessageWithId = {
+          ...newMessagess,
+          id: Math.random().toString(36).substring(2, 15),
+        };
+
+        queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
+          if (oldData?.pages) {
+            return {
+              ...oldData,
+              pages: [
+                {
+                  messages: [newMessageWithId],
+                },
+                ...oldData.pages,
+              ],
+            };
+          }
+
+          return {
+            pages: [
+              {
+                messages: [newMessageWithId],
+              },
+            ],
+          };
+        });
+      }
+
+      // Send messages to the Socket server is friend is online
+      if (socket) {
+        socket.emit("newMessage", {
+          message,
+          senderId: currentUser,
+          receiverId: friendId,
+          type: "text",
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    setEmojiPlate(false);
+    reset();
+
+    scrollToBottom();
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1000);
+  };
+
+  // Optimistically update the UI from Socket messages
   useEffect(() => {
     if (newMessageFromServer) {
       const newMessageWithId = {
@@ -137,114 +214,53 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
     }, 1000);
   }, [newMessageFromServer]);
 
-  // Optimistically update messages by the user message
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (message) {
-      const newMessagess = {
-        message,
-        senderId: currentUser,
-        receiverId: friendId,
-        type: "text",
-        createdAt: new Date().toISOString(),
-      };
-
-      mutate(newMessagess);
-
-      // only for offline mode
-      if (!friendOnline) {
-        const newMessageWithId = {
-          ...newMessagess,
-          id: Math.random().toString(36).substring(2, 15),
-        };
-
-        queryClient.setQueryData(["fetch_messages"], (oldData: any) => {
-          if (oldData?.pages) {
-            return {
-              ...oldData,
-              pages: [
-                {
-                  messages: [newMessageWithId],
-                },
-                ...oldData.pages,
-              ],
-            };
-          }
-
-          return {
-            pages: [
-              {
-                messages: [newMessageWithId],
-              },
-            ],
-          };
-        });
-      }
-
-      if (socket) {
-        socket.emit("newMessage", {
-          message,
-          senderId: currentUser,
-          receiverId: friendId,
-          type: "text",
-          createdAt: new Date().toISOString(),
-        });
-      }
-    }
-    setMessage("");
-    setEmojiPlate(false);
-
+  // Live typing events
+  useEffect(() => {
     if (socket) {
-      socket.emit("isTyping", { friendId, typing: false });
-    }
-
-    scrollToBottom();
-    setTimeout(() => {
-      scrollToBottom();
-    }, 1000);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-
-    if (socket) {
-      if (e.target.value) {
+      if (message) {
         socket.emit("isTyping", { friendId, typing: true });
       } else {
         socket.emit("isTyping", { friendId, typing: false });
       }
     }
-  };
+  }, [message]);
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="absolute bottom-2 left-0 right-0 z-50"
     >
       <div className="relative flex flex-1 items-center gap-2 p-3 pt-0">
-        <div className="relative flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2">
+        <div
+          className={clsx(
+            "relative flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2",
+            errors.message?.message === "spamming" && "border border-rose-400",
+          )}
+        >
+          {/*  */}
           <label>
             <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-zinc-200">
               <FaRegImage className="shrink-0 text-violet-700" size={22} />
             </div>
-            <input
-              hidden
-              type="file"
-              accept="image/jpeg, image/png"
-              // onChange={handleFileChange}
-            />
+            <input hidden type="file" accept="image/jpeg, image/png" />
           </label>
+
+          {/*  */}
           <input
-            className="w-full py-3 outline-none outline-0"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck="false"
+            className={clsx("w-full py-3 outline-none outline-0")}
             type="text"
             placeholder="Type a message here..."
-            value={message}
-            onChange={handleChange}
-            required
+            {...register("message")}
           />
           <button type="submit" hidden>
             Send
           </button>
+
+          {/*  */}
           <div
             onClick={() => setEmojiPlate((prev) => !prev)}
             className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-all hover:bg-violet-200"
@@ -256,48 +272,19 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             )}
           </div>
         </div>
-        <AnimatePresence mode="wait">
-          {message.trim().length > 0 && (
-            <motion.div
-              initial={{ scale: 0, height: 0, width: 0 }}
-              animate={{ scale: 1, height: "40px", width: "40px" }}
-              exit={{ scale: 0, height: 0, width: 0 }}
-              transition={{ ease: "backIn" }}
-              onClick={handleSubmit}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200"
-            >
-              <BsFillSendFill className="shrink-0 text-violet-700" size={22} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <EmojiPlate setMessage={setMessage} emojiPlate={emojiPlate} />
 
         <div
-          className={clsx(
-            "absolute bottom-0 right-0 z-[999999] h-auto w-[300px] -translate-x-[50px] -translate-y-[100px] rounded-lg bg-white px-4 pt-4 shadow-xl",
-            fileModal ? "block" : "hidden",
-          )}
+          // onClick={handlseSubmit}
+          className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200"
         >
-          <img src={myFile} alt="file" className="h-full w-full" />
-          <div className="flex flex-row-reverse items-center gap-2 py-2">
-            <div
-              // onClick={handleFileUpload}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-zinc-200"
-            >
-              <IoMdSend size={18} />
-            </div>
-            <div
-              onClick={() => {
-                setFileModal(false);
-                setMyFile("");
-              }}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-zinc-200"
-            >
-              <MdClose size={20} />
-            </div>
-          </div>
+          <BsFillSendFill className="shrink-0 text-violet-700" size={22} />
         </div>
+
+        <EmojiPlate
+          setValue={setValue}
+          message={message}
+          emojiPlate={emojiPlate}
+        />
       </div>
     </form>
   );

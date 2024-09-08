@@ -14,8 +14,9 @@ import Chat from "./Chat";
 import ChatSkeleton from "./ChatSkeleton";
 import moment from "moment";
 import TypingIndicator from "../../ui/TypingIndicator";
-import { useTyping } from "@/lib/store";
-import { groupMessagesByDate } from "@/lib/utils";
+import { groupMessagesByDate } from "@/app/utils/groupMessagesByDate";
+import { useTyping } from "@/app/stores/useTypeStore";
+
 
 interface Props {
   currentUser: string;

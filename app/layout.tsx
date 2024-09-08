@@ -8,8 +8,8 @@ import { SocketProvider } from "./components/providers/SocketProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Let's Communicate",
-  description: "Made by Dev Asik :)",
+  title: "Alochoona",
+  description: "Let's communicate with each other :)",
 };
 
 export default function RootLayout({

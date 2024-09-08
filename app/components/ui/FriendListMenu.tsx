@@ -1,7 +1,7 @@
 import React from "react";
 import { CgMenuRight } from "react-icons/cg";
 
-import { useFriendListActive } from "@/lib/store";
+import { useFriendListActive } from "@/app/stores/useFriendListStore";
 
 const FriendListMenu = () => {
   const { setFriendListActive } = useFriendListActive();

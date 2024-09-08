@@ -9,10 +9,11 @@ import Avatar from "react-avatar";
 
 import { useQuery } from "@tanstack/react-query";
 import { CgMenuRight } from "react-icons/cg";
-import { useFriendListActive } from "@/lib/store";
+
 
 import { useSocket } from "../providers/SocketProvider";
 import LogOutButton from "../ui/LogOutButton";
+import { useFriendListActive } from "@/app/stores/useFriendListStore";
 
 const ChatBoardHeader = () => {
   const { id: friendId } = useParams<{ id: string }>();

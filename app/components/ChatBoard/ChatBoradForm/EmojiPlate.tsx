@@ -2,15 +2,20 @@
 
 import { NextPage } from "next";
 import { motion, AnimatePresence } from "framer-motion";
+import { useForm, UseFormSetValue } from "react-hook-form";
 
 interface Props {
-  setMessage: React.Dispatch<React.SetStateAction<string>>;
+  setValue: UseFormSetValue<{
+    message: string;
+  }>;
+  message: string;
   emojiPlate: boolean;
 }
 
-const EmojiPlate: NextPage<Props> = ({ setMessage, emojiPlate }) => {
+const EmojiPlate: NextPage<Props> = ({ setValue, emojiPlate, message }) => {
+  // setting value with emoji
   const handleEmoji = (emoji: string) => {
-    setMessage((prev) => prev + emoji);
+    setValue("message", message + emoji);
   };
 
   return (

@@ -25,10 +25,10 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    // const socketIo = io("http://localhost:8080");
-    const socketIo = io(
-      "https://realtime-chat-app-socket-production.up.railway.app",
-    );
+    const socketIo = io("http://localhost:8080");
+    // const socketIo = io(
+    //   "https://realtime-chat-app-socket-production.up.railway.app",
+    // );
     setSocket(socketIo);
 
     return () => {
