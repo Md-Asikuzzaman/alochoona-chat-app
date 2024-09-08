@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import prisma from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ApiResponse {
@@ -8,7 +8,7 @@ interface ApiResponse {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ): Promise<NextResponse<ApiResponse>> {
   try {
     const user = await prisma.user.findUnique({
@@ -23,7 +23,7 @@ export async function GET(
         {
           message: "someting went wrong!",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
   } catch (error) {
@@ -31,7 +31,7 @@ export async function GET(
       {
         message: "someting went wrong!",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

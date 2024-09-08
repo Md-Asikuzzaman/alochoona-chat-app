@@ -3,12 +3,12 @@ interface ApiResponse {
   message?: string;
 }
 
-import prisma from "@/lib/db";
+import prisma from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ): Promise<NextResponse<ApiResponse>> {
   const { status } = await req.json();
 
@@ -29,7 +29,7 @@ export async function POST(
       {
         message: "someting went wrong!",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import prisma from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ApiResponse {
@@ -8,7 +8,7 @@ interface ApiResponse {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ): Promise<NextResponse<ApiResponse>> {
   try {
     const messages = await prisma.message.findMany({
@@ -27,7 +27,7 @@ export async function GET(
         {
           message: "someting went wrong!",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
   } catch (error) {
@@ -35,14 +35,14 @@ export async function GET(
       {
         message: "someting went wrong!",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ): Promise<NextResponse<ApiResponse>> {
   try {
     await prisma.message.delete({
@@ -57,14 +57,14 @@ export async function DELETE(
       {
         message: "someting went wrong!",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ): Promise<NextResponse<ApiResponse>> {
   console.log(params.id);
 
@@ -84,7 +84,7 @@ export async function PATCH(
       {
         message: "someting went wrong!",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,4 @@
-import prisma from "@/lib/db";
+import prisma from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ApiResponse {
