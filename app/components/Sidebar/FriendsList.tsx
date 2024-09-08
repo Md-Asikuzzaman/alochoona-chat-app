@@ -130,20 +130,7 @@ const FriendsList: NextPage<Props> = ({ userId, userName }) => {
                 );
               })}
 
-          {hasNextPage && !isPending && (
-            <div className="mt-3 flex justify-center">
-              <button
-                ref={ref}
-                onClick={() => fetchNextPage()}
-                className="mx-auto inline-flex shrink-0 items-end gap-1 rounded-full bg-[#703EFF] px-3 py-2 text-xs text-white"
-              >
-                {isFetchingNextPage && (
-                  <LuLoader2 className="animate-spin" size={18} />
-                )}
-                {isFetchingNextPage ? "Loading..." : "Load More"}
-              </button>
-            </div>
-          )}
+          {hasNextPage && !isPending && <FriendSkeleton skeletonref={ref} />}
         </div>
       </div>
     </div>

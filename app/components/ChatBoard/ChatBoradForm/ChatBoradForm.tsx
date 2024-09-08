@@ -26,6 +26,9 @@ import { z } from "zod";
 import { messageSchema } from "@/app/schemas/messageSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { GiPunch, GiPunchBlast } from "react-icons/gi";
+import { IoRocketSharp } from "react-icons/io5";
+
 interface Props {
   currentUser: string;
   scrollToBottom: () => any;
@@ -35,6 +38,8 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<Message>();
   const [friendOnline, setFriendOnline] = useState<boolean>(false);
+
+  const [messageLen, setMessageLen] = useState<string>("");
 
   const { id: friendId } = useParams<{ id: string }>();
   const userId = currentUser;
@@ -64,6 +69,10 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         const isFriendOnline = data?.some((d: any) => d.userId === friendId);
         setFriendOnline(isFriendOnline);
       });
+    }
+
+    if (socket) {
+      socket.emit("registerUser", userId);
     }
   }, [socket, friendId]);
 
@@ -220,6 +229,8 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         socket.emit("isTyping", { friendId, typing: false });
       }
     }
+
+    setMessageLen(message);
   }, [message]);
 
   return (
@@ -267,11 +278,26 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
           </div>
         </div>
 
-        <button type="submit">
-          <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200">
-            <BsFillSendFill className="shrink-0 text-violet-700" size={22} />
-          </div>
-        </button>
+        <AnimatePresence mode="wait">
+          {message?.trim() && (
+            <motion.button
+              title="Punch me!"
+              type="submit"
+              initial={{ scale: 0, height: 0, width: 0 }}
+              animate={{ scale: 1, height: "40px", width: "40px" }}
+              exit={{ scale: 0, height: 0, width: 0 }}
+              transition={{ ease: "backIn" }}
+            >
+              <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200">
+                {/* <BsFillSendFill
+                  className="shrink-0 text-violet-700"
+                  size={22}
+                /> */}
+                <GiPunchBlast className="shrink-0 text-violet-700" size={35} />
+              </div>
+            </motion.button>
+          )}
+        </AnimatePresence>
 
         <EmojiPlate
           setValue={setValue}
