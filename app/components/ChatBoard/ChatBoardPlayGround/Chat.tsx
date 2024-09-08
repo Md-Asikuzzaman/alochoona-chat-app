@@ -2,7 +2,7 @@
 
 import { NextPage } from "next";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import clsx from "clsx";
 import { MdDelete } from "react-icons/md";
 import moment from "moment";
@@ -13,6 +13,10 @@ interface Props {
 }
 
 const Chat: NextPage<Props> = ({ data, currentUser }) => {
+  const urlPattern = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
+  const urls = data.message.match(urlPattern);
+  const href = urls ? urls[0] : "";
+
   return (
     <motion.div
       initial={{
@@ -50,15 +54,30 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
             )}
           >
             {/* test message */}
-            <p
-              style={{ inlineSize: "100%", wordBreak: "break-word" }}
-              className={clsx(
-                "px-[14px] pt-[11px]",
-                data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
-              )}
-            >
-              {data.message}
-            </p>
+
+            {data.message.match(urlPattern) ? (
+              <a
+                href={href}
+                target="_blank"
+                style={{ inlineSize: "100%", wordBreak: "break-word" }}
+                className={clsx(
+                  "px-[14px] pt-[11px] underline",
+                  data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
+                )}
+              >
+                {data.message}
+              </a>
+            ) : (
+              <p
+                style={{ inlineSize: "100%", wordBreak: "break-word" }}
+                className={clsx(
+                  "px-[14px] pt-[11px]",
+                  data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
+                )}
+              >
+                {data.message}
+              </p>
+            )}
 
             {/* message date */}
             <p
