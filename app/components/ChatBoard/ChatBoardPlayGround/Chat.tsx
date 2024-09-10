@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 import { MdDelete } from "react-icons/md";
 import moment from "moment";
+import LinkConverter from "./LinkConverter";
 
 interface Props {
   data: MessageType;
@@ -14,8 +15,6 @@ interface Props {
 
 const Chat: NextPage<Props> = ({ data, currentUser }) => {
   const urlPattern = /https?:\/\/[^\s/$.?#].[^\s]*/gi;
-  const urls = data.message.match(urlPattern);
-  const href = urls ? urls[0] : "";
 
   return (
     <motion.div
@@ -53,20 +52,9 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
                 : "rounded-b-2xl rounded-e-2xl bg-white text-[#162C4D]",
             )}
           >
-            {/* test message */}
-
+            {/* Message */}
             {data.message.match(urlPattern) ? (
-              <a
-                href={href}
-                target="_blank"
-                style={{ inlineSize: "100%", wordBreak: "break-word" }}
-                className={clsx(
-                  "px-[14px] pt-[11px] underline",
-                  data.message.length <= 25 ? "pb-[16px]" : "pb-[2px]",
-                )}
-              >
-                {data.message}
-              </a>
+              <LinkConverter text={data.message} />
             ) : (
               <p
                 style={{ inlineSize: "100%", wordBreak: "break-word" }}
@@ -79,7 +67,7 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
               </p>
             )}
 
-            {/* message date */}
+            {/* Message date */}
             <p
               className={clsx(
                 "shrink-0 pb-1 pr-3 text-[11px]",
@@ -93,19 +81,8 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
           </div>
         )}
 
-        {/* <div
-          className={clsx(
-            "flex w-full shrink-0",
-            currentUser === data.senderId ? "justify-end" : "justify-start",
-          )}
-        >
-          <p className="mt-[2px] text-[11px] text-zinc-400">
-            {moment(data.createdAt).format("llll")}
-          </p>
-        </div> */}
-
         {/* SETUP for [file] type data */}
-        {/* {data.type === "file" && (
+        {data.type === "file" && (
           <div
             className={clsx(
               "z-20 inline-block overflow-hidden",
@@ -116,7 +93,7 @@ const Chat: NextPage<Props> = ({ data, currentUser }) => {
           >
             <img src={data.message} height={200} width={200} />
           </div>
-        )} */}
+        )}
       </div>
     </motion.div>
   );

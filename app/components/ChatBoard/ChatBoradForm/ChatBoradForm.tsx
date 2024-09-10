@@ -8,13 +8,8 @@ import { Message } from "@prisma/client";
 import axios from "axios";
 import clsx from "clsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
 import { _64ify } from "next-file-64ify";
-
-import { MdClose, MdEmojiEmotions } from "react-icons/md";
-import { BsFillSendFill } from "react-icons/bs";
 import { FaRegImage } from "react-icons/fa6";
-import { IoMdSend } from "react-icons/io";
 
 import { useSocket } from "../../providers/SocketProvider";
 import EmojiPlate from "./EmojiPlate";
@@ -25,9 +20,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { messageSchema } from "@/app/schemas/messageSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { GiPunch, GiPunchBlast } from "react-icons/gi";
-import { IoRocketSharp } from "react-icons/io5";
+import MessageSendBtn from "./MessageSendBtn";
+import EmojiBtn from "./EmojiBtn";
 
 interface Props {
   currentUser: string;
@@ -38,8 +32,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
   const [emojiPlate, setEmojiPlate] = useState<boolean>(false);
   const [newMessageFromServer, setNewMessageFromServer] = useState<Message>();
   const [friendOnline, setFriendOnline] = useState<boolean>(false);
-
-  const [messageLen, setMessageLen] = useState<string>("");
 
   const { id: friendId } = useParams<{ id: string }>();
   const userId = currentUser;
@@ -229,8 +221,6 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
         socket.emit("isTyping", { friendId, typing: false });
       }
     }
-
-    setMessageLen(message);
   }, [message]);
 
   return (
@@ -245,15 +235,20 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             errors.message?.message === "spamming" && "border border-rose-400",
           )}
         >
-          {/*  */}
-          <label>
+          {/* image view */}
+          <label className="relative">
             <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-zinc-200">
               <FaRegImage className="shrink-0 text-violet-700" size={22} />
             </div>
-            <input hidden type="file" accept="image/jpeg, image/png" />
+            <input disabled hidden type="file" accept="image/jpeg, image/png" />
           </label>
+          {/* images send modal */}
+          {/* <div className="absolute top-0 h-12 w-[400px] bg-violet-600">
+            hello there
+          </div> */}
+          {/* image view */}
 
-          {/*  */}
+          {/* Chat input field */}
           <input
             autoComplete="off"
             autoCorrect="off"
@@ -265,40 +260,10 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             {...register("message")}
           />
 
-          {/*  */}
-          <div
-            onClick={() => setEmojiPlate((prev) => !prev)}
-            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-all hover:bg-violet-200"
-          >
-            {!emojiPlate ? (
-              <MdEmojiEmotions className="shrink-0 text-violet-700" size={24} />
-            ) : (
-              <MdClose className="shrink-0 text-violet-700" size={24} />
-            )}
-          </div>
+          <EmojiBtn emojiPlate={emojiPlate} setEmojiPlate={setEmojiPlate} />
         </div>
 
-        <AnimatePresence mode="wait">
-          {message?.trim() && (
-            <motion.button
-              title="Punch me!"
-              type="submit"
-              initial={{ scale: 0, height: 0, width: 0 }}
-              animate={{ scale: 1, height: "40px", width: "40px" }}
-              exit={{ scale: 0, height: 0, width: 0 }}
-              transition={{ ease: "backIn" }}
-            >
-              <div className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-zinc-200 transition-colors hover:bg-violet-200">
-                {/* <BsFillSendFill
-                  className="shrink-0 text-violet-700"
-                  size={22}
-                /> */}
-                <GiPunchBlast className="shrink-0 text-violet-700" size={35} />
-              </div>
-            </motion.button>
-          )}
-        </AnimatePresence>
-
+        <MessageSendBtn message={message} />
         <EmojiPlate
           setValue={setValue}
           message={message}
