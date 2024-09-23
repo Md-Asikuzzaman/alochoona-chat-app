@@ -4,7 +4,6 @@ import { NextPage } from "next";
 
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import { MdDelete } from "react-icons/md";
 import moment from "moment";
 import LinkConverter from "./LinkConverter";
 

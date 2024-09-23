@@ -70,7 +70,7 @@ const ChatBoardHeader = () => {
       )}
       <div className="flex flex-1 justify-between">
         <div>
-          <h4 className="font-semibold">
+          <h4 className="font-semibold text-slate-800">
             {isLoading || isFetching ? "Loading..." : user?.username}
           </h4>
           <p className="text-xs text-zinc-500">

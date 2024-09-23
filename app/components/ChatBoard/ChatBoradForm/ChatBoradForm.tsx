@@ -254,7 +254,7 @@ const ChatBoradForm: NextPage<Props> = ({ currentUser, scrollToBottom }) => {
             autoCorrect="off"
             autoCapitalize="none"
             spellCheck="false"
-            className={clsx("w-full py-3 outline-none outline-0")}
+            className={clsx("w-full py-3 outline-none outline-0 bg-white")}
             type="text"
             placeholder="Type a message here..."
             {...register("message")}

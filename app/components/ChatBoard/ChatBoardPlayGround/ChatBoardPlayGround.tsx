@@ -16,7 +16,7 @@ import moment from "moment";
 import TypingIndicator from "../../ui/TypingIndicator";
 import { groupMessagesByDate } from "@/app/utils/groupMessagesByDate";
 import { useTyping } from "@/app/stores/useTypeStore";
-
+import clsx from "clsx";
 
 interface Props {
   currentUser: string;
@@ -34,7 +34,7 @@ const ChatBoardPlayGround: NextPage<Props> = ({
 
   useEffect(() => {
     if (isTyping) {
-      scrollToTyping();
+      // scrollToTyping();
     }
   }, [isTyping]);
 
@@ -95,16 +95,19 @@ const ChatBoardPlayGround: NextPage<Props> = ({
   return (
     <div
       ref={scrollRef}
-      className="flex h-[calc(100dvh-160px)] flex-col-reverse overflow-x-hidden overflow-y-scroll px-5 pt-2"
+      className={clsx(
+        "bg-redd-500 relative flex h-[calc(100dvh-160px)] flex-col-reverse overflow-x-hidden overflow-y-scroll px-5 pt-2 transition-all",
+        isTyping ? "pb-12" : "pb-2",
+      )}
     >
       {/* chats Logic */}
       <AnimatePresence mode="popLayout">
-        {/* typing indicator */}
         {isTyping && (
-          <div className="mt-1 flex justify-start">
+          <div className="absolute bottom-0 left-5 flex justify-start">
             <TypingIndicator />
           </div>
         )}
+        {/* typing indicator */}
         {groupedMessages &&
           Object.keys(groupedMessages).map((date, i) => (
             <div key={i}>

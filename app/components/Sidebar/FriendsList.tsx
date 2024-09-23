@@ -100,13 +100,13 @@ const FriendsList: NextPage<Props> = ({ userId, userName }) => {
         {/* close button*/}
         <div
           onClick={() => setFriendListActive()}
-          className="mr-3 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-rose-200 lg:hidden"
+          className="mr-3 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-rose-400 transition-colors hover:bg-rose-500 lg:hidden"
         >
-          <IoClose size={22} />
+          <IoClose size={22} className="text-black" />
         </div>
       </div>
 
-      <h2 className="mb-4 px-4 text-xl font-semibold">Friends List</h2>
+      <h2 className="mb-4 px-4 text-xl font-semibold text-slate-800">Friends List...</h2>
 
       <div className="relative h-[calc(100vh-110px)]">
         <div className="flex h-full flex-col gap-3 overflow-y-scroll px-4 pb-4">
